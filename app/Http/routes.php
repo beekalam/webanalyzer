@@ -16,3 +16,4 @@ $app->get('/', function () use ($app) {
 });
 
 $app->get('/logs/{page}','LogsController@show');
+$app->get('/logs/{user_id}/{page}', 'LogsController@showt');
