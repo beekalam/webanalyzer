@@ -1,5 +1,6 @@
 import random
 import datetime
+import os
 
 id = 0
 user_id = 0
@@ -82,7 +83,7 @@ class connection_log:
 	def generate_sql_string(self):
 		ret = ''
 		for item in self.getsql():
-				ret += item + "\n"
+				ret += item +  os.linesep
 		return ret
 
 class connection_log_details:
@@ -134,7 +135,7 @@ class connection_log_details:
 
 		ret_string = ''	
 		for item in res:
-			ret_string += item + "\n"
+			ret_string += item +  os.linesep
 		return ret_string
 
 class log:
