@@ -15,5 +15,9 @@ $app->get('/', function () use ($app) {
     return $app->welcome();
 });
 
-$app->get('/logs/{page}','LogsController@show');
-$app->get('/logs/{user_id}/{page}', 'LogsController@showLogs');
+
+$app->get('/logs/{page}','LogsController@showLogs');
+$app->get('/logdetails/{username}/{page:[\d]+}', 'LogsController@showLogdetails');
+$app->get('/weblogs/{connection_log_id}/{page}', 'LogsController@showWebLogs');
+// $app->get('/logs/{user_id:[\d]+}/{page}', 'LogsController@showLogs');
+// $app->get('/logs/{user_name}/{page}', 'LogsController@showWebLogs');
