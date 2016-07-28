@@ -69,5 +69,20 @@ class LogsController
 		return $ret;
 	}
 
+	private function converttime($datetime){
+			$fmt = new IntlDateFormatter("fa_IR@calendar=persian", IntlDateFormatter::SHORT, IntlDateFormatter::NONE
+				, 'Asia/Tehran', IntlDateFormatter::TRADITIONAL);
+			$date =  $fmt->format($datetime);
+			$date = str_replace("ش",'',$date);
+			$date = str_replace("ه‍",'', $date);
+			$date = str_replace('.','', $date);
+
+			$fmt = new IntlDateFormatter("fa_IR@calendar=persian", IntlDateFormatter::NONE, IntlDateFormatter::FULL
+				, 'Asia/Tehran', IntlDateFormatter::TRADITIONAL);
+			$time = $fmt->format($datetime);
+			//todo : calculate 15 or unicode equiv
+			$time =  mb_substr($time,0,15);
+			return $date . " " . $time;
+	}
 
 }
