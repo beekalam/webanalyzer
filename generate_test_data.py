@@ -65,9 +65,11 @@ class connection_log:
 		ip = randomip()
 		cd = connection_log_details(self.connection_log_id, self.login_time, self.logout_time,self.username,ip)
 		ret.append(cd.getsql())
-		for i in xrange(random.randint(300,800)):
-			b = log(self.login_time,str(ip) )
+		temp_datetime = self.login_time
+		while(temp_datetime < self.logout_time):
+			b = log(temp_datetime,str(ip) )
 			ret.append(b.getsql())
+			temp_datetime += datetime.timedelta(seconds=random.randint(10,15))
 		return ret
 
 
