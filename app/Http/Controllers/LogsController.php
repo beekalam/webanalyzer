@@ -24,6 +24,11 @@ class LogsController
 		$offset = ($page * $per_page) - $per_page;
 
 		$data = ConnectionLog::skip($offset)->take($per_page)->get();
+		// change to persian time
+		foreach ($data as $item) {
+			$item["login_time"] = $this->converttime(new \DateTime($item["login_time"]));
+			$item["logout_time"] = $this->converttime(new \DateTime($item["logout_time"]));
+		}
 		$ret = ["data" => $data];
 		return json_encode($ret);
 	}
@@ -36,6 +41,10 @@ class LogsController
 		$data = ConnectionLogDetail::where('name', '=', 'username')
 									->where('value', '=', $username)
 									->get();
+		foreach($data as $item){
+			$item["login_time"] = $this->converttime(new \DateTime($item["login_time"]));
+			$item["logout_time"] = $this->converttime(new \DateTime($item["logout_time"]));
+		}
 
 		$ret = ["data" => $data];
 		return $ret;
@@ -61,6 +70,10 @@ class LogsController
 					// ->get();
 					->skip($offset)->take(10)->get();
 
+		foreach($data as $item){
+			$item["login_time"] = $this->converttime(new \DateTime($item["login_time"]));
+		}
+
 		$ret = ["data" => $data,
 				 "login_time" => $login_time,
 				 "logout_time" => $logout_time
@@ -70,19 +83,23 @@ class LogsController
 	}
 
 	private function converttime($datetime){
-			$fmt = new IntlDateFormatter("fa_IR@calendar=persian", IntlDateFormatter::SHORT, IntlDateFormatter::NONE
-				, 'Asia/Tehran', IntlDateFormatter::TRADITIONAL);
-			$date =  $fmt->format($datetime);
-			$date = str_replace("ش",'',$date);
-			$date = str_replace("ه‍",'', $date);
-			$date = str_replace('.','', $date);
+			$fmt = new \IntlDateFormatter("fa_IR@calendar=persian", \IntlDateFormatter::SHORT,\IntlDateFormatter::NONE, 'Asia/Tehran',\IntlDateFormatter::TRADITIONAL);
 
-			$fmt = new IntlDateFormatter("fa_IR@calendar=persian", IntlDateFormatter::NONE, IntlDateFormatter::FULL
-				, 'Asia/Tehran', IntlDateFormatter::TRADITIONAL);
+			$date =  $fmt->format($datetime);
+			$char_replace = array("ش","ه‍",".");
+			$date = str_replace($char_replace, '', $date);
+			$search = array('۱','۲','۳','۴','۵','۶','۷','۸','۹','۰');
+			$replace = array('1','2','3','4','5','6','7','8','9','0');
+			$date = str_replace($search,$replace, $date);
+			$fmt = new \IntlDateFormatter("fa_IR@calendar=persian", \IntlDateFormatter::NONE, \IntlDateFormatter::FULL
+				, 'Asia/Tehran', \IntlDateFormatter::TRADITIONAL);
 			$time = $fmt->format($datetime);
 			//todo : calculate 15 or unicode equiv
 			$time =  mb_substr($time,0,15);
-			return $date . " " . $time;
+			$time = str_replace($search, $replace, $time);
+			$time = (string)$time;
+			$date = (string)$date;
+			return trim($date) . " " . trim($time);
 	}
 
 }
