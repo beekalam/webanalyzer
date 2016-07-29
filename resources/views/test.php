@@ -51,11 +51,11 @@
 
         <script src="/js/bootstrap.min.js"></script>
         <script>
-            //todo : make urls for weblogs logdetails and logs here
             base_url = 'http://localhost:8000/';
             user_log_url = base_url + 'logs/';
             weblogs_url = base_url + 'weblogs/';
-            page = 1;
+            user_log_page = 1;
+            weblog_page = 1;
             $('#showusers').click(function(e){
                 "ues strict";
                 $('#users').empty();
@@ -63,7 +63,7 @@
                 // data = get_user_log();
                 get_user_log(function(data){
                     $("#users").append(render_user(data));
-                    page += 1;
+                    user_log_page += 1;
                 });
                 // $("#users").append(render_user(data));
                 // page += 1;
@@ -80,7 +80,7 @@
             });
             //-------------------------------------------------
             function get_user_log(handleData){
-                url = user_log_url + page;
+                url = user_log_url + user_log_page;
                 $.ajax({
                     url: url,
                     type: 'GET',
@@ -93,7 +93,7 @@
             }
 
             function get_web_log(connection_log_id,handleData){
-                url = weblogs_url + connection_log_id + "/" + page;
+                url = weblogs_url + connection_log_id + "/" + weblog_page;
                 $.ajax({
                     url: url,
                     type: 'GET',
@@ -146,7 +146,7 @@
                 get_user_log(function(data){
                     $("#users").empty();
                     $("#users").append(render_user(data));
-                    page += 1;
+                    user_log_page += 1;
                 });
             });
             //-------------------btnPrev------------------------------------------
@@ -155,7 +155,7 @@
                 get_user_log(function(data){
                     $("#users").empty();
                     $("#users").append(render_user(data));
-                    page -= 1;
+                    user_log_page -= 1;
                 });
             });
             //--------------------showweblog---------------------------------------
@@ -163,10 +163,10 @@
                 e.preventDefault();
                 $("#users").empty();
                 connection_log_id = e.target.value;
-                page = 1;
+                weblog_page = 1;
                 get_web_log(connection_log_id, function(data){
                     $("#users").append(render_weblog(data,connection_log_id));
-                    page += 1;
+                    weblog_page += 1;
                 });
             });
             //----------------------------------------------------------------------
@@ -210,7 +210,7 @@
                 get_web_log(connection_log_id, function(data){
                     $("#users").empty();
                     $("#users").append(render_weblog(data, connection_log_id));
-                    page += 1;
+                    weblog_page += 1;
                 });
             });
             //-------------------btnWeblogPrev------------------------------------------
@@ -220,7 +220,7 @@
                 get_web_log(connection_log_id, function(data){
                     $("#users").empty();
                     $("#users").append(render_weblog(data,connection_log_id));
-                    page -= 1;
+                    weblog_page -= 1;
                 });
             });
 
