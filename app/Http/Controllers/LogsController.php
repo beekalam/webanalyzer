@@ -45,7 +45,6 @@ class LogsController
 			$item["login_time"] = $this->converttime(new \DateTime($item["login_time"]));
 			$item["logout_time"] = $this->converttime(new \DateTime($item["logout_time"]));
 		}
-
 		$ret = ["data" => $data];
 		return $ret;
 	}
