@@ -72,6 +72,9 @@ $app->Middleware([
 	App\Http\Middleware\RequestLogMiddleware::class
  ]);
 
+$app->routeMiddleware([
+    'auth' => App\Http\Middleware\Authenticate::class,
+]);
 /*
 |--------------------------------------------------------------------------
 | Register Service Providers
@@ -83,9 +86,9 @@ $app->Middleware([
 |
 */
 
-// $app->register(App\Providers\AppServiceProvider::class);
+$app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
-
+$app->register(App\Providers\AuthServiceProvider::class);
 /*
 |--------------------------------------------------------------------------
 | Load The Application Routes
