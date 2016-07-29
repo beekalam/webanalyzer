@@ -53,6 +53,8 @@
         <script>
             //todo : make urls for weblogs logdetails and logs here
             base_url = 'http://localhost:8000/';
+            user_log_url = base_url + 'logs/';
+            weblogs_url = base_url + 'weblogs/';
             page = 1;
             $('#showusers').click(function(e){
                 "ues strict";
@@ -78,7 +80,7 @@
             });
             //-------------------------------------------------
             function get_user_log(handleData){
-                url = base_url + "logs/" + page;
+                url = user_log_url + page;
                 $.ajax({
                     url: url,
                     type: 'GET',
@@ -91,7 +93,7 @@
             }
 
             function get_web_log(connection_log_id,handleData){
-                url = base_url + "weblogs/" + connection_log_id + "/" + page;
+                url = weblogs_url + connection_log_id + "/" + page;
                 $.ajax({
                     url: url,
                     type: 'GET',
