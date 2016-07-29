@@ -51,6 +51,7 @@
 
         <script src="/js/bootstrap.min.js"></script>
         <script>
+            //todo : make urls for weblogs logdetails and logs here
             base_url = 'http://localhost:8000/';
             page = 1;
             $('#showusers').click(function(e){
@@ -162,12 +163,12 @@
                 connection_log_id = e.target.value;
                 page = 1;
                 get_web_log(connection_log_id, function(data){
-                    $("#users").append(render_weblog(data));
+                    $("#users").append(render_weblog(data,connection_log_id));
                     page += 1;
                 });
             });
             //----------------------------------------------------------------------
-            function render_weblog(data)
+            function render_weblog(data,connection_log_id)
             {
                 ret = "<div class='table-responsive'>";
                 ret += "<table class='table table-striped'>";
@@ -195,28 +196,28 @@
                 ret += thead;
                 ret += tbody;
                 ret += "</table>";
-                ret += "<button id='btnWeblogPrev' class='btn btn-success'>prev</button>";
-                ret += "<button id='btnWeblogNext' class='btn btn-success'>next</button>";
+                ret += "<button id='btnWeblogPrev' class='btn btn-success' value='" + connection_log_id  + "'>prev</button>";
+                ret += "<button id='btnWeblogNext' class='btn btn-success' value='" + connection_log_id + "'>next</button>";
                 ret += "</div>";
                 return ret;
             }
             //---------------------btnWeblogNext---------------------------------------
             $('#users').on('click', '#btnWeblogNext', function(e){
                 e.preventDefault();
-                //todo append connection_log_id to the button and for the btnWeblogPrev too
-                // connection_log_id = e.target.value
-                get_web_log(function(data){
+                connection_log_id = $("#btnWeblogNext").val(); 
+                get_web_log(connection_log_id, function(data){
                     $("#users").empty();
-                    $("#users").append(render_weblog(data));
+                    $("#users").append(render_weblog(data, connection_log_id));
                     page += 1;
                 });
             });
             //-------------------btnWeblogPrev------------------------------------------
             $("#users").on('click','#btnWeblogPrev', function(e){
                 e.preventDefault();
-                get_web_log(function(data){
+                connection_log_id = $("#btnWeblogPrev").val();
+                get_web_log(connection_log_id, function(data){
                     $("#users").empty();
-                    $("#users").append(render_weblog(data));
+                    $("#users").append(render_weblog(data,connection_log_id));
                     page -= 1;
                 });
             });
