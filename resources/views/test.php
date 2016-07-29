@@ -52,6 +52,7 @@
         </div>
 
         <script src="/js/bootstrap.min.js"></script>
+
         <script>
             base_url = 'http://localhost:8000/';
             user_log_url = base_url + 'logs/';
@@ -61,27 +62,33 @@
             user_log_page = 1;
             weblog_page = 1;
             userlog_details_page = 1;
+
             $('#showusers').click(function(e){
                 "ues strict";
                 $('#users').empty();
                 e.preventDefault();
-                // data = get_user_log();
                 get_user_log(function(data){
                     $("#users").append(render_user(data));
                     user_log_page += 1;
                 });
-                // $("#users").append(render_user(data));
-                // page += 1;
-                // url = base_url + "logs/" + page;
-                // $.ajax({
-                //     url: url,
-                //     type: 'GET',
-                //     contentType:'application/json',
-                //     dataType:'json',
-                //     success:function(data){
-                //         $("#users").append(render_user(data));
-                //     }
-                // });
+            });
+            //---------------------btnNext-----------------------
+            $('#users').on('click', '#btnNext', function(e){
+                e.preventDefault();
+                get_user_log(function(data){
+                    $("#users").empty();
+                    $("#users").append(render_user(data));
+                    user_log_page += 1;
+                });
+            });
+            //-------------------btnPrev-------------------------
+            $("#users").on('click','#btnPrev', function(e){
+                e.preventDefault();
+                get_user_log(function(data){
+                    $("#users").empty();
+                    $("#users").append(render_user(data));
+                    user_log_page -= 1;
+                });
             });
             //-------------------------------------------------
             function get_user_log(handleData){
@@ -96,7 +103,39 @@
                     }
                 });
             }
-
+//=====================================================================================
+            //--------------------showweblog---------------------------------------
+            $("#users").on('click', '.showweblog',function(e){
+                e.preventDefault();
+                $("#users").empty();
+                connection_log_id = e.target.value;
+                weblog_page = 1;
+                get_web_log(connection_log_id, function(data){
+                    $("#users").append(render_weblog(data,connection_log_id));
+                    weblog_page += 1;
+                });
+            });
+            //---------------------btnWeblogNext---------------------------------------
+            $('#users').on('click', '#btnWeblogNext', function(e){
+                e.preventDefault();
+                connection_log_id = $("#btnWeblogNext").val(); 
+                get_web_log(connection_log_id, function(data){
+                    $("#users").empty();
+                    $("#users").append(render_weblog(data, connection_log_id));
+                    weblog_page += 1;
+                });
+            });
+            //-------------------btnWeblogPrev------------------------------------------
+            $("#users").on('click','#btnWeblogPrev', function(e){
+                e.preventDefault();
+                connection_log_id = $("#btnWeblogPrev").val();
+                get_web_log(connection_log_id, function(data){
+                    $("#users").empty();
+                    $("#users").append(render_weblog(data,connection_log_id));
+                    weblog_page -= 1;
+                });
+            });
+            //-------------------------------------------------
             function get_web_log(connection_log_id,handleData){
                 url = weblogs_url + connection_log_id + "/" + weblog_page;
                 $.ajax({
@@ -109,7 +148,47 @@
                     }
                 });
             }
+//==================================================================================
+            //---------------------------------------------------
+            $("#showuserdetails").click(function(e){
+                e.preventDefault();
+                username = $("#usertext").val();
+                if(username == ''){
+                    alert('provide username');
+                    return;
+                }
+                userlog_details_page = 1;
+                get_users_details(username,function(data){
+                    console.log(data);
+                    $("#users").empty();
+                    $("#users").append(render_users_details( data,username));
+                });
+            });
 
+            //---------------- btnUserdetailsNext----------------------------------------
+            $("#users").on('click', '#btnUserdetailNext', function(e){
+                e.preventDefault();
+                username = $("#btnUserdetailNext").val();
+                console.log("username: " + username);
+                get_users_details(username,function(data){
+                    $("#users").empty();
+                    $("#users").append(render_users_details(data, username));
+                    
+                    userlog_details_page += 1;
+                });
+            });
+            //------------------btnUserdetaiNext------------------------------------------
+            $("#users").on('click', '#btnUserdetailPrev', function(e){
+                e.preventDefault();
+                username = $("#btnUserdetailPrev").val();
+                console.log("username: " + username);
+                get_users_details(username,function(data){
+                    $("#users").empty();
+                    $("#users").append(render_users_details(data, username));
+                    userlog_details_page -= 1;
+                });
+            });
+            //-------------------------------------------------
             function get_users_details(username,handleData){
                 url = user_log_details_url  + username + "/" + userlog_details_page;
                 $.ajax({
@@ -122,7 +201,8 @@
                     }
                 });
             }
-
+//==================================================================================
+            //--------------------------------------------------
             function render_users_details(data,username)
             {
                 ret = "<div class='table-responsive'>";
@@ -156,21 +236,7 @@
                 ret += "</div>";
                 return ret;
             }
-
-            $("#showuserdetails").click(function(e){
-                e.preventDefault();
-                username = $("#usertext").val();
-                if(username == ''){
-                    alert('provide username');
-                    return;
-                }
-                userlog_details_page = 1;
-                get_users_details(username,function(data){
-                    console.log(data);
-                    $("#users").empty();
-                    $("#users").append(render_users_details( data,username));
-                });
-            });
+          
             //--------------------------------------------------
             function render_user(data)
             {
@@ -207,35 +273,8 @@
                //       item += '<button class="btnDelete" style="display:none" value="' + post.id + '">delete</button>----';
                //       item += '<button class="btnEdit" style="display:none" value="' + post.id + '">edit</button>';
             }
-            //---------------------btnNext---------------------------------------
-            $('#users').on('click', '#btnNext', function(e){
-                e.preventDefault();
-                get_user_log(function(data){
-                    $("#users").empty();
-                    $("#users").append(render_user(data));
-                    user_log_page += 1;
-                });
-            });
-            //-------------------btnPrev------------------------------------------
-            $("#users").on('click','#btnPrev', function(e){
-                e.preventDefault();
-                get_user_log(function(data){
-                    $("#users").empty();
-                    $("#users").append(render_user(data));
-                    user_log_page -= 1;
-                });
-            });
-            //--------------------showweblog---------------------------------------
-            $("#users").on('click', '.showweblog',function(e){
-                e.preventDefault();
-                $("#users").empty();
-                connection_log_id = e.target.value;
-                weblog_page = 1;
-                get_web_log(connection_log_id, function(data){
-                    $("#users").append(render_weblog(data,connection_log_id));
-                    weblog_page += 1;
-                });
-            });
+
+         
             //----------------------------------------------------------------------
             function render_weblog(data,connection_log_id)
             {
@@ -270,51 +309,8 @@
                 ret += "</div>";
                 return ret;
             }
-            //---------------------btnWeblogNext---------------------------------------
-            $('#users').on('click', '#btnWeblogNext', function(e){
-                e.preventDefault();
-                connection_log_id = $("#btnWeblogNext").val(); 
-                get_web_log(connection_log_id, function(data){
-                    $("#users").empty();
-                    $("#users").append(render_weblog(data, connection_log_id));
-                    weblog_page += 1;
-                });
-            });
-            //-------------------btnWeblogPrev------------------------------------------
-            $("#users").on('click','#btnWeblogPrev', function(e){
-                e.preventDefault();
-                connection_log_id = $("#btnWeblogPrev").val();
-                get_web_log(connection_log_id, function(data){
-                    $("#users").empty();
-                    $("#users").append(render_weblog(data,connection_log_id));
-                    weblog_page -= 1;
-                });
-            });
-            //---------------- btnUserdetailsNext----------------------------------------
-            $("#users").on('click', '#btnUserdetailNext', function(e){
-                e.preventDefault();
-                username = $("#btnUserdetailNext").val();
-                console.log("username: " + username);
-                get_users_details(username,function(data){
-                    $("#users").empty();
-                    $("#users").append(render_users_details(data, username));
-                    
-                    userlog_details_page += 1;
-                });
-            });
-            //------------------btnUserdetaiNext------------------------------------------
-            $("#users").on('click', '#btnUserdetailPrev', function(e){
-                e.preventDefault();
-                username = $("#btnUserdetailPrev").val();
-                console.log("username: " + username);
-                get_users_details(username,function(data){
-                    $("#users").empty();
-                    $("#users").append(render_users_details(data, username));
-                    userlog_details_page -= 1;
-                });
-            });
 
         </script>
-       
+
     </body>
 </html>
