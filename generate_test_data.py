@@ -18,6 +18,8 @@ def get_id():
 def next_day():
 	global date_time
 	date_time = date_time + datetime.timedelta(days=1)
+	randminutes = random.randint(10,15);
+	date_time = date_time + datetime.timedelta(minutes=randminutes)
 	return date_time
 
 def get_date_time():

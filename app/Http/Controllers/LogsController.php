@@ -36,11 +36,12 @@ class LogsController
 	public function showLogDetails($username, $page)
 	{
 		$per_page = $this->per_page;
+		$per_page = 5;
 		$offset = ($page * $per_page) - $per_page;
 
 		$data = ConnectionLogDetail::where('name', '=', 'username')
 									->where('value', '=', $username)
-									->get();
+									->skip($offset)->take($per_page)->get();
 		foreach($data as $item){
 			$item["login_time"] = $this->converttime(new \DateTime($item["login_time"]));
 			$item["logout_time"] = $this->converttime(new \DateTime($item["logout_time"]));
