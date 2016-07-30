@@ -103,7 +103,7 @@ class connection_log_details:
 		self.make_random_name_values()
 
 	def make_random_name_values(self):
-		self.names = ['bytes in', 'bytes out','ippool','ip pool assigned ip', 'nas port type','username']
+		self.names = ['bytes_in', 'bytes_out','ippool','ip_pool_assigned_ip', 'nas_port_type','username']
 		values = self.values
 		values.append(random.randint(8000, 25000))
 		values.append(random.randint(8000, 10000))
