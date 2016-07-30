@@ -19,14 +19,15 @@
                 <!--+++++ login form++++++++++++++++-->
                 <form method="post" action="/token" id="loginform" class="navbar-form navbar-right">
                 <div class="form-group">
-                <input type="text" placeholder="username" id="username" class="form-control">
+                <input type="text" placeholder="username" id="username" class="form-control" value="admin">
                 </div>
                 <div class="form-group">
-                <input type="password" placeholder="password" id="password" class="form-control">
+                <input type="password" placeholder="password" id="password" class="form-control" value="admin">
                 </div>
-                <input type="submit" id="login" class="btn btn-success">
+                <input type="submit" id="btnLogin" class="btn btn-success">
                 </form>
                 <button class="btn btn-success" id="btnlogout" style="display:none">log out</button>
+
             </div>
         </div>
         </nav>
@@ -202,6 +203,29 @@
                 });
             }
 //==================================================================================
+            //--------------------btnLogin----------------------
+            $("#btnLogin").click(function(e){
+                e.preventDefault();
+                data = JSON.stringify({"username" : $("#username").val(),
+                                       "password": $("#password").val()});
+                url = "/token";
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    contentType:'application/json',
+                    dataType:'json',
+                    data: data,
+                    success: function(data){
+                        console.log("btnlogin-->success: ");
+                        console.log(data);
+                        $("#loginform").hide();
+                        $("#btnlogout").show();
+                    },
+                    error: function(){
+                        alert('login error')
+                    }
+                });
+            });
             //--------------------------------------------------
             function render_users_details(data,username)
             {

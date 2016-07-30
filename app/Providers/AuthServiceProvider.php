@@ -32,9 +32,23 @@ class AuthServiceProvider extends ServiceProvider
         // the User instance via an API token or any other method necessary.
 
         Auth::viaRequest('api', function ($request) {
-            if ($request->input('api_token')) {
-                return User::where('api_token', $request->input('api_token'))->first();
-            }
+            // if ($request->input('jwt')) 
+            // {
+            //      try
+            //      {
+            //         $jwt = $request->input('jwt');
+            //         //todo: read from config
+            //         $key = "123";
+            //         $algorithm = ['HS256'];
+            //         $token = JWT::decode($jwt, $key,$algorithm);
+            //         return ['jwt' => $jwt];
+            //      }
+            //      catch(Exception $e)
+            //      {
+            //         return null;
+            //      }
+            // }
+            // return null;
         });
     }
 }

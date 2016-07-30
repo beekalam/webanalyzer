@@ -58,7 +58,7 @@ class LogsController
 		// find all connection_log_details with the $user_id
 		// $m = ['name' => 'username', 'value' => $user_name];
 		$session_log_details = ConnectionLogDetail::where('connection_log_id', '=',$connection_log_id)
-								->where('name','ip pool assigned ip')
+								->where('name','ip_pool_assigned_ip')
 								->first();
 
  		$session_ip = $session_log_details['value'];
