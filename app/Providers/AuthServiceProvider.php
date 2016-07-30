@@ -6,6 +6,7 @@ use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Firebase\JWT\JWT;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -32,23 +33,23 @@ class AuthServiceProvider extends ServiceProvider
         // the User instance via an API token or any other method necessary.
 
         Auth::viaRequest('api', function ($request) {
-            // if ($request->input('jwt')) 
-            // {
-            //      try
-            //      {
-            //         $jwt = $request->input('jwt');
-            //         //todo: read from config
-            //         $key = "123";
-            //         $algorithm = ['HS256'];
-            //         $token = JWT::decode($jwt, $key,$algorithm);
-            //         return ['jwt' => $jwt];
-            //      }
-            //      catch(Exception $e)
-            //      {
-            //         return null;
-            //      }
-            // }
-            // return null;
+            if ($request->input('jwt')) 
+            {
+                 try
+                 {
+                    $jwt = $request->input('jwt');
+                    //todo: read from config
+                    $key = "123";
+                    $algorithm = ['HS256'];
+                    $token = JWT::decode($jwt, $key,$algorithm);
+                    return ['jwt' => $jwt];
+                 }
+                 catch(Exception $e)
+                 {
+                    return null;
+                 }
+            }
+            return null;
         });
     }
 }

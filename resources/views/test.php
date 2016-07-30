@@ -55,6 +55,11 @@
         <script src="/js/bootstrap.min.js"></script>
 
         <script>
+             var store = store || {};
+             store.setJWT = function(data){
+                  this.JWT = data;
+            }
+
             base_url = 'http://localhost:8000/';
             user_log_url = base_url + 'logs/';
             weblogs_url = base_url + 'weblogs/';
@@ -68,6 +73,7 @@
                 "ues strict";
                 $('#users').empty();
                 e.preventDefault();
+                user_log_page = 1;
                 get_user_log(function(data){
                     $("#users").append(render_user(data));
                     user_log_page += 1;
@@ -94,11 +100,13 @@
             //-------------------------------------------------
             function get_user_log(handleData){
                 url = user_log_url + user_log_page;
+                data ={'jwt' : store.JWT};
                 $.ajax({
                     url: url,
                     type: 'GET',
                     contentType:'application/json',
                     dataType:'json',
+                    data: data,
                     success:function(data){
                         handleData(data);
                     }
@@ -218,6 +226,7 @@
                     success: function(data){
                         console.log("btnlogin-->success: ");
                         console.log(data);
+                        store.setJWT(data["jwt"]);
                         $("#loginform").hide();
                         $("#btnlogout").show();
                     },

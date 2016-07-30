@@ -18,8 +18,7 @@ $app->get('/', function () use ($app) {
     return view('test');
 });
 
-
-$app->get('/logs/{page}','LogsController@showLogs');
+$app->get('/logs/{page}',[ 'middleware' => 'auth', 'uses' =>'LogsController@showLogs']);
 $app->get('/logdetails/{username}/{page:[\d]+}', 'LogsController@showLogdetails');
 $app->get('/weblogs/{connection_log_id}/{page}', 'LogsController@showWebLogs');
 // $app->get('/logs/{user_id:[\d]+}/{page}', 'LogsController@showLogs');
