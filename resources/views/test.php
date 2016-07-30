@@ -24,10 +24,9 @@
                 <div class="form-group">
                 <input type="password" placeholder="password" id="password" class="form-control" value="admin">
                 </div>
-                <input type="submit" id="btnLogin" class="btn btn-success">
+                <input type="submit" id="btnLogin" class="btn btn-success" value="login">
                 </form>
                 <button class="btn btn-success" id="btnlogout" style="display:none">log out</button>
-
             </div>
         </div>
         </nav>
@@ -147,11 +146,13 @@
             //-------------------------------------------------
             function get_web_log(connection_log_id,handleData){
                 url = weblogs_url + connection_log_id + "/" + weblog_page;
+                data ={'jwt' : store.JWT};
                 $.ajax({
                     url: url,
                     type: 'GET',
                     contentType: 'application/json',
                     dataType:'json',
+                    data: data,
                     success:function(data){
                         handleData(data);
                     }
@@ -200,11 +201,13 @@
             //-------------------------------------------------
             function get_users_details(username,handleData){
                 url = user_log_details_url  + username + "/" + userlog_details_page;
+                data ={'jwt' : store.JWT};
                 $.ajax({
                     url: url,
                     type: 'GET',
                     contentType:'application/json',
                     dataType: 'json',
+                    data: data,
                     success:function(data){
                         handleData(data);
                     }
