@@ -103,7 +103,7 @@ class connection_log_details:
 		self.make_random_name_values()
 
 	def make_random_name_values(self):
-		self.names = ['bytes_in', 'bytes_out','ippool','ip_pool_assigned_ip', 'nas_port_type','username']
+		self.names = ['bytes_in', 'bytes_out','ippool','ippool_assigned_ip', 'nas_port_type','username']
 		values = self.values
 		values.append(random.randint(8000, 25000))
 		values.append(random.randint(8000, 10000))
@@ -157,7 +157,7 @@ class log:
 		return ret_string
 
 	def getsql(self):
-		ret =  "insert into logs(method, action,url,source, login_time) values ("
+		ret =  "insert into logs(method, action,url,source, visited_at) values ("
 		ret +=  "'{0}', '{1}', '{2}', '{3}', '{4}');".format(self.method, self.action, self.url, self.source, self.login_time)
 		return ret
 

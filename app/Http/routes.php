@@ -18,21 +18,32 @@ $app->get('/', function () use ($app) {
     return view('test');
 });
 
-$app->get('/logs/{page}',[ 
-	'middleware' => 'auth', 
-	'uses' =>'LogsController@showLogs'
+// $app->get('/logs/{page}',[ 
+// 	'middleware' => 'auth', 
+// 	'uses' =>'LogsController@showLogs'
+// ]);
+
+// $app->get('/logdetails/{username}/{page:[\d]+}', [ 
+// 	'middleware' => 'auth',
+// 	'uses' => 'LogsController@showLogdetails'
+// ]);
+
+// $app->get('/weblogs/{connection_log_id}/{page}', [
+// 	'middleware' => 'auth',
+// 	 'uses' => 'LogsController@showWebLogs'
+// ]);
+
+$app->get('/logs/{page:[\d]+}',[ 
+    'uses' =>'LogsController@showLogs'
 ]);
 
 $app->get('/logdetails/{username}/{page:[\d]+}', [ 
-	'middleware' => 'auth',
-	'uses' => 'LogsController@showLogdetails'
+    'uses' => 'LogsController@showLogdetails'
 ]);
 
 $app->get('/weblogs/{connection_log_id}/{page}', [
-	'middleware' => 'auth',
-	 'uses' => 'LogsController@showWebLogs'
+     'uses' => 'LogsController@showWebLogs'
 ]);
-
 // $app->get('/logs/{user_id:[\d]+}/{page}', 'LogsController@showLogs');
 // $app->get('/logs/{user_name}/{page}', 'LogsController@showWebLogs');
 
