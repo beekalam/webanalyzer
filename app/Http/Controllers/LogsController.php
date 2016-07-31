@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Log;
 use App\ConnectionLog;
+use App\LogView;
 use App\ConnectionLogDetail;
 use Log as llog;
 class LogsController
@@ -23,8 +24,8 @@ class LogsController
 		$per_page = $this->per_page;
 		$offset = ($page * $per_page) - $per_page;
 
-		$data = ConnectionLog::skip($offset)->take($per_page)->get();
-
+		// $data = ConnectionLog::skip($offset)->take($per_page)->get();
+		$data = LogView::skip($offset)->take($per_page)->get();
 		// change to persian time
 		foreach ($data as $item) {
 			$item["login_time"] = $this->converttime(new \DateTime($item["login_time"]));
@@ -41,11 +42,13 @@ class LogsController
 		$per_page = 5;
 		$offset = ($page * $per_page) - $per_page;
 
-		$data = ConnectionLogDetail::where('name', '=', 'username')
-									->where('value', '=', $username)
-									->skip($offset)->take($per_page)->get();
-		foreach($data as $item){
+		// $data = ConnectionLogDetail::where('name', '=', 'username')
+		// 							->where('value', '=', $username)
+		// 							->skip($offset)->take($per_page)->get();
+		$data = LogView::where('username', '=', $username)
+						->skip($offset)->take($per_page)->get();
 
+		foreach($data as $item){
 			$item["login_time"] = $this->converttime(new \DateTime($item["login_time"]));
 			$item["logout_time"] = $this->converttime(new \DateTime($item["logout_time"]));
 		}
@@ -70,7 +73,6 @@ class LogsController
 
 		$data = Log::where('source','=', $session_ip)
 					->whereBetween('visited_at', [$login_time, $logout_time])
-					// ->get();
 					->skip($offset)->take(10)->get();
 
 		foreach($data as $item){

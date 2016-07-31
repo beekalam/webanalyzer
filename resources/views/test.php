@@ -246,7 +246,9 @@
                 thead = "<thead><tr>";
                 tbody = "<tbody>";
                 for(var i in data["data"][0]){
+                    if(i=="connection_log_id" || i=="username" || i=="bytes_out" || i=="bytes_in" || i=="ippool_assigned_ip" || i =="login_time" || i=="logout_time"){
                     thead += "<th>" + i + "</th>";
+                    }
                 }
                 
                 thead += "</tr></thead>";
@@ -255,8 +257,8 @@
                     tbody +="<tr>";
                     for (var i in item){
                         if (i == "connection_log_id"){
-                            tbody += "<td><button class='showweblog btn btn-success' value='" + item[i] + "'>log</button></td>";
-                        }else{
+                            tbody += "<td><button class='showweblog btn btn-success' value='" + item[i] + "'>weblogs</button></td>";
+                        }else if(i=="connection_log_id" || i=="username" || i=="bytes_out" || i=="bytes_in" || i=="ippool_assigned_ip" || i =="login_time" || i=="logout_time"){
                             tbody += "<td>" +  item[i] + "</td>";
                         }
                     }
@@ -281,7 +283,9 @@
                 thead = "<thead><tr>";
                 tbody = "<tbody>";
                 for(var i in data["data"][0]){
+                    if(i=="connection_log_id" || i=="username" || i=="bytes_out" || i =="bytes_in" || i == "login_time" || i=="logout_time"|| i=="ippool_assigned_ip"){
                     thead += "<th>" + i + "</th>";
+                    }
                 }
                 
                 thead += "</tr></thead>";
@@ -291,7 +295,7 @@
                     for (var i in item){
                         if (i == "connection_log_id"){
                             tbody += "<td><button class='showweblog btn btn-success' value='" + item[i] + "'>log</button></td>";
-                        }else{
+                        }else if(i=="connection_log_id" || i=="username" || i=="bytes_out" || i =="bytes_in" || i == "login_time" || i=="logout_time"|| i=="ippool_assigned_ip"){
                             tbody += "<td>" +  item[i] + "</td>";
                         }
                     }
