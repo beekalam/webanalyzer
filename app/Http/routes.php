@@ -33,6 +33,9 @@ $app->get('/weblogs/{connection_log_id}/{page}', [
 	 'uses' => 'LogsController@showWebLogs'
 ]);
 
+$app->get('/logdetails/{username}/{startdate}/{enddate}/{page}',[
+    'uses' => 'LogsController@showLogdetailsByDate'
+]);
 // $app->get('/logs/{page:[\d]+}',[ 
 //     'uses' =>'LogsController@showLogs'
 // ]);

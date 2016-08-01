@@ -56,6 +56,23 @@ class LogsController
 		return $ret;
 	}
 
+	public function showLogdetailsByDate($username,$startdate, $enddate, $page)
+	{
+		$per_page = $this->per_page;
+		$offset = ($page * $per_page)  - $per_page;
+		$data = LogView::where('username', '=', $username)
+						->where('login_time', '>=' , $startdate)
+						->where('logout_time', '<=', $enddate)
+						->skip($offset)->take($per_page)->get();
+
+		foreach($data as $item){
+			$item["login_time"] = $this->converttime(new \DateTime($item["login_time"]));
+			$item["logout_time"] = $this->converttime(new \DateTime($item["logout_time"]));
+		}
+
+		$ret = ["data" => $data];
+		return $ret;
+	}
 	public function showWebLogs($connection_log_id, $page)
 	{
 		$per_page = $this->per_page;

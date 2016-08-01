@@ -189,18 +189,9 @@
             //---------------------------------------------------
             $("#showuserdetails").click(function(e){
                 e.preventDefault();
-                username = $("#usertext").val();
-                start_date = $("#start_date_input").val();
-                sd_arr = start_date.split("/");
-                end_date = $("#end_date_input").val();
-                ed_arr = end_date.split("/");
-                console.log("start_date: " + start_date);
-                console.log("end date: " + end_date);
 
-                console.log("jaliedate: " + JalaliDate.jalaliToGregorian(sd_arr[0],sd_arr[1],sd_arr[2]));
-                console.log("jaliedate: " + JalaliDate.jalaliToGregorian(ed_arr[0],ed_arr[1],ed_arr[2]));
-                start_date =  JalaliDate.jalaliToGregorian(sd_arr[0],sd_arr[1],sd_arr[2]);
-                end_date = JalaliDate.jalaliToGregorian(ed_arr[0],ed_arr[1],ed_arr[2]);
+                username = $("#usertext").val();
+                
                 
                 if(username == ''){
                     alert('provide username');
@@ -237,9 +228,32 @@
                     userlog_details_page -= 1;
                 });
             });
-            //-------------------------------------------------
+
+            //--------------------------------------------------
             function get_users_details(username,handleData){
                 url = user_log_details_url  + username + "/" + userlog_details_page;
+                //todo check for empty values
+                start_date = $("#start_date_input").val();
+                end_date = $("#end_date_input").val();
+                if(start_date.length > 0 && end_date.length > 0)
+                {
+                    start_date = convert_to_gregorian(start_date);
+                    end_date = convert_to_gregorian(end_date);
+                    // ed_arr = end_date.split("/");
+                    // console.log("jaliedate: " + JalaliDate.jalaliToGregorian(sd_arr[0],sd_arr[1],sd_arr[2]));
+                    // console.log("jaliedate: " + JalaliDate.jalaliToGregorian(ed_arr[0],ed_arr[1],ed_arr[2]));
+                    // s_date = JalaliDate.jalaliToGregorian(sd_arr[0],sd_arr[1],sd_arr[2]);
+                    // start_date = s_date[0] + "-" + s_date[1] + "-" + s_date[2];
+                    // end_date = JalaliDate.jalaliToGregorian(ed_arr[0],ed_arr[1],ed_arr[2]);
+                    // start_date = (start_date);
+                    // end_date = String(end_date);
+                    // start_date = start_date.replace(',','-');
+                    // end_date = end_date.replace(',','-');
+                    console.log("start_date.length: " + start_date.length);
+                    console.log("end_date.length: " + end_date.length);
+                        url = user_log_details_url + username + "/" + start_date + "/" + end_date + "/" + userlog_details_page;
+                }
+                
                 data ={'jwt' : store.JWT};
                 $.ajax({
                     url: url,
@@ -388,7 +402,21 @@
                 ret += "</div>";
                 return ret;
             }
+            //-------------------------------------------------
+            function convert_to_gregorian(str)
+            {
+                str_arr = str.split("/");
+                year = str_arr[0];
+                month = str_arr[1];
+                day = str_arr[2];
 
+                converted_date = JalaliDate.jalaliToGregorian(year, month, day);
+                c_year = converted_date[0];
+                c_month = converted_date[1];
+                c_day = converted_date[2];
+
+                return c_year + "-" + c_month + "-" + c_day;
+            }
         </script>
 
     </body>
