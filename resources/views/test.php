@@ -7,8 +7,12 @@
         <!-- <link href='//fonts.googleapis.com/css?family=Lato:300' rel='stylesheet' type='text/css'> -->
         <link href="/css/bootstrap.min.css" rel="stylesheet">
         <!-- <link href="assets/css/custom.css" rel="stylesheet"> -->
-
+        <link rel="stylesheet" href="/jalalicalendar/skins/aqua/theme.css">
         <script src="/js/jquery-1.12.4.js"></script>
+        <script src="/jalalicalendar/jalali.js"></script>
+        <script src="/jalalicalendar/calendar.js"></script>
+        <script src="/jalalicalendar/calendar-setup.js"></script>
+        <script src="/jalalicalendar/lang/calendar-fa.js"></script>
     </head>
     <body>
         <nav class="navbar navbar-inverse fixed-top">
@@ -47,6 +51,29 @@
         <button id="showusers" class="btn"> all logins</button>
         <button id="showuserdetails" class="btn">user login details</button>
         <input type="text" placeholder="username" id ="usertext" value="phasan" >
+
+        <input id="start_date_input" type="text">
+        <input id="start_date_btn" type="button" value="start_date">
+        <script>
+            Calendar.setup({
+                inputField: 'start_date_input',
+                button: 'start_date_btn',
+                ifFormat: '%Y/%m/%d',
+                dateType: 'jalali'
+            });
+        </script>
+
+        <input id="end_date_input" type="text">
+        <input id="end_date_btn" type="button" value="end_date">
+        <script>
+            Calendar.setup({
+                inputField: 'end_date_input',
+                button: 'end_date_btn',
+                ifFormat: '%Y/%m/%d',
+                dateType: 'jalali'
+            });
+        </script>
+
         <div id="users">
         </div>
         </div>
@@ -163,6 +190,18 @@
             $("#showuserdetails").click(function(e){
                 e.preventDefault();
                 username = $("#usertext").val();
+                start_date = $("#start_date_input").val();
+                sd_arr = start_date.split("/");
+                end_date = $("#end_date_input").val();
+                ed_arr = end_date.split("/");
+                console.log("start_date: " + start_date);
+                console.log("end date: " + end_date);
+
+                console.log("jaliedate: " + JalaliDate.jalaliToGregorian(sd_arr[0],sd_arr[1],sd_arr[2]));
+                console.log("jaliedate: " + JalaliDate.jalaliToGregorian(ed_arr[0],ed_arr[1],ed_arr[2]));
+                start_date =  JalaliDate.jalaliToGregorian(sd_arr[0],sd_arr[1],sd_arr[2]);
+                end_date = JalaliDate.jalaliToGregorian(ed_arr[0],ed_arr[1],ed_arr[2]);
+                
                 if(username == ''){
                     alert('provide username');
                     return;
