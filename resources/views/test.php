@@ -48,9 +48,9 @@
         <hr>
         </form>
         
-        <button id="showusers" class="btn"> all logins</button>
-        <button id="showuserdetails" class="btn">user login details</button>
-        <input type="text" placeholder="username" id ="usertext" value="phasan" >
+        <button id="alllogins" class="btn"> all logins</button>
+        <button id="showuserlogs" class="btn">user login details</button>
+        <input type="text" placeholder="username" id ="usertext" value="user1" >
 
         <input id="start_date_input" type="text">
         <input id="start_date_btn" type="button" value="start_date">
@@ -87,45 +87,47 @@
             }
 
             base_url = 'http://localhost:8000/';
+            all_logs_url = base_url + 'logs/';
             user_log_url = base_url + 'logs/';
             weblogs_url = base_url + 'weblogs/';
             user_log_details_url = base_url + 'logdetails/';
 
+            all_logs_page = 1;
             user_log_page = 1;
             weblog_page = 1;
             userlog_details_page = 1;
 
-            $('#showusers').click(function(e){
+            $('#alllogins').click(function(e){
                 "ues strict";
                 $('#users').empty();
                 e.preventDefault();
-                user_log_page = 1;
-                get_user_log(function(data){
-                    $("#users").append(render_user(data));
-                    user_log_page += 1;
+                all_logs_page = 1;
+                all_logs(function(data){
+                    $("#users").append(render_log(data));
+                    all_logs_page += 1;
                 });
             });
             //---------------------btnNext-----------------------
             $('#users').on('click', '#btnNext', function(e){
                 e.preventDefault();
-                get_user_log(function(data){
+                all_logs(function(data){
                     $("#users").empty();
-                    $("#users").append(render_user(data));
-                    user_log_page += 1;
+                    $("#users").append(render_log(data));
+                    all_logs_page += 1;
                 });
             });
             //-------------------btnPrev-------------------------
             $("#users").on('click','#btnPrev', function(e){
                 e.preventDefault();
-                get_user_log(function(data){
+                all_logs(function(data){
                     $("#users").empty();
-                    $("#users").append(render_user(data));
-                    user_log_page -= 1;
+                    $("#users").append(render_log(data));
+                    all_logs_page -= 1;
                 });
             });
             //-------------------------------------------------
-            function get_user_log(handleData){
-                url = user_log_url + user_log_page;
+            function all_logs(handleData){
+                url = all_logs_url + all_logs_page;
                 data ={'jwt' : store.JWT};
                 $.ajax({
                     url: url,
@@ -138,100 +140,45 @@
                     }
                 });
             }
-//=====================================================================================
-            //--------------------showweblog---------------------------------------
-            $("#users").on('click', '.showweblog',function(e){
-                e.preventDefault();
-                $("#users").empty();
-                connection_log_id = e.target.value;
-                weblog_page = 1;
-                get_web_log(connection_log_id, function(data){
-                    $("#users").append(render_weblog(data,connection_log_id));
-                    weblog_page += 1;
-                });
-            });
-            //---------------------btnWeblogNext---------------------------------------
-            $('#users').on('click', '#btnWeblogNext', function(e){
-                e.preventDefault();
-                connection_log_id = $("#btnWeblogNext").val(); 
-                get_web_log(connection_log_id, function(data){
-                    $("#users").empty();
-                    $("#users").append(render_weblog(data, connection_log_id));
-                    weblog_page += 1;
-                });
-            });
-            //-------------------btnWeblogPrev------------------------------------------
-            $("#users").on('click','#btnWeblogPrev', function(e){
-                e.preventDefault();
-                connection_log_id = $("#btnWeblogPrev").val();
-                get_web_log(connection_log_id, function(data){
-                    $("#users").empty();
-                    $("#users").append(render_weblog(data,connection_log_id));
-                    weblog_page -= 1;
-                });
-            });
-            //-------------------------------------------------
-            function get_web_log(connection_log_id,handleData){
-                url = weblogs_url + connection_log_id + "/" + weblog_page;
-                data ={'jwt' : store.JWT};
-                $.ajax({
-                    url: url,
-                    type: 'GET',
-                    contentType: 'application/json',
-                    dataType:'json',
-                    data: data,
-                    success:function(data){
-                        handleData(data);
-                    }
-                });
-            }
 //==================================================================================
             //---------------------------------------------------
-            $("#showuserdetails").click(function(e){
+            $("#showuserlogs").click(function(e){
                 e.preventDefault();
-
                 username = $("#usertext").val();
-                
-                
                 if(username == ''){
                     alert('provide username');
                     return;
                 }
-                userlog_details_page = 1;
-                get_users_details(username,function(data){
-                    console.log(data);
+                user_log_page = 1;
+                get_user_logs(function(data){
                     $("#users").empty();
-                    $("#users").append(render_users_details( data,username));
+                    $("#users").append(render_user_log(data));
                 });
             });
 
             //---------------- btnUserdetailsNext----------------------------------------
             $("#users").on('click', '#btnUserdetailNext', function(e){
                 e.preventDefault();
-                username = $("#btnUserdetailNext").val();
-                console.log("username: " + username);
-                get_users_details(username,function(data){
+                get_user_logs(function(data){
                     $("#users").empty();
-                    $("#users").append(render_users_details(data, username));
-                    
-                    userlog_details_page += 1;
+                    $("#users").append(render_user_log(data));
+                    user_log_page += 1;
                 });
             });
             //------------------btnUserdetaiNext------------------------------------------
             $("#users").on('click', '#btnUserdetailPrev', function(e){
                 e.preventDefault();
-                username = $("#btnUserdetailPrev").val();
-                console.log("username: " + username);
-                get_users_details(username,function(data){
+                get_user_logs(function(data){
                     $("#users").empty();
-                    $("#users").append(render_users_details(data, username));
-                    userlog_details_page -= 1;
+                    $("#users").append(render_user_log(data));
+                    user_log_page -= 1;
                 });
             });
 
             //--------------------------------------------------
-            function get_users_details(username,handleData){
-                url = user_log_details_url  + username + "/" + userlog_details_page;
+            function get_user_logs(handleData){
+                username = $("#usertext").val();
+                url = base_url + "logs/" +  username + "/" + user_log_page;
                 //todo check for empty values
                 start_date = $("#start_date_input").val();
                 end_date = $("#end_date_input").val();
@@ -239,21 +186,11 @@
                 {
                     start_date = convert_to_gregorian(start_date);
                     end_date = convert_to_gregorian(end_date);
-                    // ed_arr = end_date.split("/");
-                    // console.log("jaliedate: " + JalaliDate.jalaliToGregorian(sd_arr[0],sd_arr[1],sd_arr[2]));
-                    // console.log("jaliedate: " + JalaliDate.jalaliToGregorian(ed_arr[0],ed_arr[1],ed_arr[2]));
-                    // s_date = JalaliDate.jalaliToGregorian(sd_arr[0],sd_arr[1],sd_arr[2]);
-                    // start_date = s_date[0] + "-" + s_date[1] + "-" + s_date[2];
-                    // end_date = JalaliDate.jalaliToGregorian(ed_arr[0],ed_arr[1],ed_arr[2]);
-                    // start_date = (start_date);
-                    // end_date = String(end_date);
-                    // start_date = start_date.replace(',','-');
-                    // end_date = end_date.replace(',','-');
                     console.log("start_date.length: " + start_date.length);
                     console.log("end_date.length: " + end_date.length);
-                        url = user_log_details_url + username + "/" + start_date + "/" + end_date + "/" + userlog_details_page;
+                        url = base_url + "logs/" + username + "/" + start_date + "/" + end_date + "/" + user_log_page;
                 }
-                
+
                 data ={'jwt' : store.JWT};
                 $.ajax({
                     url: url,
@@ -291,17 +228,16 @@
                     }
                 });
             });
-            //--------------------------------------------------
-            function render_users_details(data,username)
+            //-----------------------------------------------------------------
+            function render_log(data)
             {
                 ret = "<div class='table-responsive'>";
                 ret += "<table class='table table-striped'>";
                 thead = "<thead><tr>";
                 tbody = "<tbody>";
+                console.log(data["data"]);
                 for(var i in data["data"][0]){
-                    if(i=="connection_log_id" || i=="username" || i=="bytes_out" || i=="bytes_in" || i=="ippool_assigned_ip" || i =="login_time" || i=="logout_time"){
                     thead += "<th>" + i + "</th>";
-                    }
                 }
                 
                 thead += "</tr></thead>";
@@ -309,48 +245,7 @@
                 $.each(data["data"],function(index,item){
                     tbody +="<tr>";
                     for (var i in item){
-                        if (i == "connection_log_id"){
-                            tbody += "<td><button class='showweblog btn btn-success' value='" + item[i] + "'>weblogs</button></td>";
-                        }else if(i=="connection_log_id" || i=="username" || i=="bytes_out" || i=="bytes_in" || i=="ippool_assigned_ip" || i =="login_time" || i=="logout_time"){
                             tbody += "<td>" +  item[i] + "</td>";
-                        }
-                    }
-                    tbody += "</tr>";
-                });
-
-                tbody += "</tbody>";
-                ret += thead;
-                ret += tbody;
-                ret += "</table>";
-                ret += "<button id='btnUserdetailPrev' class='btn btn-success' value='" + username +"'>prev</button>";
-                ret += "<button id='btnUserdetailNext' class='btn btn-success' value='" + username + "'>next</button>";
-                ret += "</div>";
-                return ret;
-            }
-          
-            //--------------------------------------------------
-            function render_user(data)
-            {
-                ret = "<div class='table-responsive'>";
-                ret += "<table class='table table-striped'>";
-                thead = "<thead><tr>";
-                tbody = "<tbody>";
-                for(var i in data["data"][0]){
-                    if(i=="connection_log_id" || i=="username" || i=="bytes_out" || i =="bytes_in" || i == "login_time" || i=="logout_time"|| i=="ippool_assigned_ip"){
-                    thead += "<th>" + i + "</th>";
-                    }
-                }
-                
-                thead += "</tr></thead>";
-
-                $.each(data["data"],function(index,item){
-                    tbody +="<tr>";
-                    for (var i in item){
-                        if (i == "connection_log_id"){
-                            tbody += "<td><button class='showweblog btn btn-success' value='" + item[i] + "'>log</button></td>";
-                        }else if(i=="connection_log_id" || i=="username" || i=="bytes_out" || i =="bytes_in" || i == "login_time" || i=="logout_time"|| i=="ippool_assigned_ip"){
-                            tbody += "<td>" +  item[i] + "</td>";
-                        }
                     }
                     tbody += "</tr>";
                 });
@@ -363,18 +258,15 @@
                 ret += "<button id='btnNext' class='btn btn-success'>next</button>";
                 ret += "</div>";
                 return ret;
-               //       item += '<button class="btnDelete" style="display:none" value="' + post.id + '">delete</button>----';
-               //       item += '<button class="btnEdit" style="display:none" value="' + post.id + '">edit</button>';
-            }
-
-         
+            } 
             //----------------------------------------------------------------------
-            function render_weblog(data,connection_log_id)
+            function render_user_log(data)
             {
                 ret = "<div class='table-responsive'>";
                 ret += "<table class='table table-striped'>";
                 thead = "<thead><tr>";
                 tbody = "<tbody>";
+                console.log(data["data"]);
                 for(var i in data["data"][0]){
                     thead += "<th>" + i + "</th>";
                 }
@@ -384,11 +276,7 @@
                 $.each(data["data"],function(index,item){
                     tbody +="<tr>";
                     for (var i in item){
-                        // if (i == "connection_log_id"){
-                        //     tbody += "<td><button class='showweblog btn btn-success' value='" + item[i] + "'>log</button></td>";
-                        // }else{
                             tbody += "<td>" +  item[i] + "</td>";
-                        // }
                     }
                     tbody += "</tr>";
                 });
@@ -397,12 +285,12 @@
                 ret += thead;
                 ret += tbody;
                 ret += "</table>";
-                ret += "<button id='btnWeblogPrev' class='btn btn-success' value='" + connection_log_id  + "'>prev</button>";
-                ret += "<button id='btnWeblogNext' class='btn btn-success' value='" + connection_log_id + "'>next</button>";
+                ret += "<button id='btnUserdetailPrev' class='btn btn-success'>prev</button>";
+                ret += "<button id='btnUserdetailNext' class='btn btn-success'>next</button>";
                 ret += "</div>";
                 return ret;
-            }
-            //-------------------------------------------------
+            } 
+            //-----------------------------------------------------------------------
             function convert_to_gregorian(str)
             {
                 str_arr = str.split("/");
@@ -417,6 +305,7 @@
 
                 return c_year + "-" + c_month + "-" + c_day;
             }
+            //------------------------------------------------------------------------
         </script>
 
     </body>

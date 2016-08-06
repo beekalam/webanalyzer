@@ -18,37 +18,47 @@ $app->get('/', function () use ($app) {
     return view('test');
 });
 
-$app->get('/logs/{page}',[ 
-	'middleware' => 'auth', 
-	'uses' =>'LogsController@showLogs'
-]);
-
-$app->get('/logdetails/{username}/{page:[\d]+}', [ 
-	'middleware' => 'auth',
-	'uses' => 'LogsController@showLogdetails'
-]);
-
-$app->get('/weblogs/{connection_log_id}/{page}', [
-	'middleware' => 'auth',
-	 'uses' => 'LogsController@showWebLogs'
-]);
-
-$app->get('/logdetails/{username}/{startdate}/{enddate}/{page}',[
-    'uses' => 'LogsController@showLogdetailsByDate'
-]);
-// $app->get('/logs/{page:[\d]+}',[ 
-//     'uses' =>'LogsController@showLogs'
+// $app->get('/logs/{page}',[ 
+// 	'middleware' => 'auth', 
+// 	'uses' =>'LogsController@showLogs'
 // ]);
 
 // $app->get('/logdetails/{username}/{page:[\d]+}', [ 
-//     'uses' => 'LogsController@showLogdetails'
+// 	'middleware' => 'auth',
+// 	'uses' => 'LogsController@showLogdetails'
 // ]);
 
 // $app->get('/weblogs/{connection_log_id}/{page}', [
+// 	'middleware' => 'auth',
+// 	 'uses' => 'LogsController@showWebLogs'
+// ]);
+
+// $app->get('/logdetails/{username}/{startdate}/{enddate}/{page}',[
+//     'uses' => 'LogsController@showLogdetailsByDate'
+// ]);
+
+$app->get('/logs/{page:[\d]+}',[ 
+    // 'middleware' => 'auth',
+    'uses' =>'LogsController@showAllLogs'
+]);
+
+$app->get('/logs/{username}/{page:[\d]+}', [ 
+    // 'middleware' => 'auth',
+    'uses' => 'LogsController@showLogs'
+]);
+
+$app->get('/logs/{username}/{startdate}/{enddate}/{page}',[
+    // 'middleware' => 'auth',
+    'uses' => 'LogsController@showLogsByDate'
+]);
+
+// $app->get('/weblogs/{connection_log_id}/{page}', [
+//     // 'middleware' =>'auth',
 //      'uses' => 'LogsController@showWebLogs'
 // ]);
-// $app->get('/logs/{user_id:[\d]+}/{page}', 'LogsController@showLogs');
-// $app->get('/logs/{user_name}/{page}', 'LogsController@showWebLogs');
+
+$app->get('/logs/{user_id:[\d]+}/{page}', 'LogsController@showLogs');
+$app->get('/logs/{user_name}/{page}', 'LogsController@showWebLogs');
 
 
 $app->post('/token', function(Request $request){
