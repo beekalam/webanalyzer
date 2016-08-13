@@ -52,6 +52,20 @@ $app->get('/logs/{username}/{startdate}/{enddate}/{page}',[
     'uses' => 'LogsController@showLogsByDate'
 ]);
 
+$app->get('/nases/',[
+    // 'middleware' => 'auth',
+    'uses' => 'LogsController@showNases'
+]);
+
+$app->post('/nases/add',[
+    // 'middleware' => 'auth',
+    'uses' => 'LogsController@addNas'
+]);
+
+$app->get('/nases/delete/{id:[\d]+}',[
+    // 'middleware' => 'auth',
+    'uses' => 'LogsController@deleteNas'
+]);
 // $app->get('/weblogs/{connection_log_id}/{page}', [
 //     // 'middleware' =>'auth',
 //      'uses' => 'LogsController@showWebLogs'

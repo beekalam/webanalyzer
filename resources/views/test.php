@@ -15,10 +15,20 @@
         <script src="/jalalicalendar/lang/calendar-fa.js"></script>
     </head>
     <body>
-        <nav class="navbar navbar-inverse fixed-top">
+        <nav class="navbar navbar-inverse fixed-top"> <!-- fixme: change to navbar-fixed-top -->
         <div class="container">
         <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
         </div>
+            <ul class="nav navbar-nav">
+                <li><a id='manageNases' href="#">manage nases</a></li> 
+                <li><a id='addNas' href="#">add nas</a></li>
+            </ul>
             <div id="navbar" class="navbar-collapse collapse">
                 <!--+++++ login form++++++++++++++++-->
                 <form method="post" action="/token" id="loginform" class="navbar-form navbar-right">
@@ -76,6 +86,26 @@
 
         <div id="users">
         </div>
+
+        <form id="addNasForm" style="display:none">
+            <div class="form-group">
+                <label for="nasip">nas ip: </label>
+                <input type="text" class="form-control" id="nasip" required>
+            </div>
+            <div class="form-group">
+                <label for="username">username:</label>
+                <input type="text" class="form-control" id="nasusername">
+            </div>
+            <div class="form-group">
+                <label for="password">password</label>
+                <input type="password" class="form-control" id="naspassword">
+            </div>
+            <div class="form-group">
+                <label for="description">description</label>
+                <textarea id="description" cols="15" rows="5"></textarea> 
+            </div>
+            <button type="submit" class="btn btn-default" id="btnAddNas">submit</button>
+        </div>
         </div>
 
         <script src="/js/bootstrap.min.js"></script>
@@ -86,6 +116,7 @@
                   this.JWT = data;
             }
 
+            //base_url = 'http://172.16.8.13:8000/';
             base_url = 'http://localhost:8000/';
             all_logs_url = base_url + 'logs/';
             user_log_url = base_url + 'logs/';
@@ -203,6 +234,115 @@
                     }
                 });
             }
+//==================================================================================
+            $("#manageNases").click(function(e){
+                e.preventDefault();
+                // alert("in manageNases click");
+                get_nas_list(function(data){
+                    $("#users").empty();
+                    $("#users").append(render_nases(data));
+                })
+            });
+
+            $("#users").on('click', '#deleteNas', function(e){
+                e.preventDefault();
+                nasid = parseInt(this["value"]);
+                url = base_url + "nases/delete/" + nasid;
+                $.ajax({
+                    url:url,
+                    type:'GET',
+                    contentType:'application/json',
+                    success:function(data){
+                        console.log(data);
+                        //fixme trigger manage nases here
+                    },
+                    error:function(){
+                        alert("could not delete nas");
+                    }
+                });
+            });
+
+            function get_nas_list(handleData){
+                url = base_url + "nases";
+                // data ={'jwt' : store.JWT};
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    contentType:'application/json',
+                    dataType:'json',
+                    // data: data,
+                    success:function(data){
+                        handleData(data);
+                    }
+                });
+            }
+            function render_nases(data)
+            {
+                ret = "<div class='table-responsive'>";
+                ret += "<table class='table table-striped'>";
+                thead = "<thead><tr>";
+                tbody = "<tbody>";
+                for(var i in data["data"][0])
+                {
+                    thead += "<th>" + i + "</th>";
+                }
+                thead += "<th> edit </th>";
+                thead += "<th> delete </th>";
+                thead += "</tr></thead>";
+
+                $.each(data["data"], function(index,item){
+                    tbody += "<tr>";
+                    for (var i in item) {
+                        tbody += "<td>" + item[i] + "</td>";
+                    }
+                    console.log(item);
+                    tbody += "<td><button id='editNas' class='btn btn-success' value='" + item['nas_id'] + "'>edit</button></td>";
+                    tbody += "<td><button id='deleteNas' class='btn btn-success' value='" + item['nas_id'] + "'>delete</button></td>";
+                    tbody += "</tr>";
+                });
+
+                tbody += "</tbody>";
+                ret += thead;
+                ret += tbody;
+                ret += "</table>";
+                ret += "</div>";
+                return ret;
+            }
+//==================================================================================
+            $('#addNas').click(function(e){
+                e.preventDefault();
+                $("#users").empty();
+                $("#addNasForm").show();
+            })
+
+            $('#btnAddNas').click( function(e){
+                e.preventDefault(); 
+                alert('inside btnAddNas');
+                nasip = $('#nasip').val();
+                username = $('#nasusername').val();
+                password = $('#naspassword').val();
+                description = $('#description').val();
+                data = JSON.stringify({"nasip" : nasip,
+                                        "username": username,
+                                        "password": password,
+                                        "description" : description });
+                console.log(data);
+                url= base_url + "nases/add";
+                $.ajax({
+                    url : url,
+                    type : 'POST',
+                    contentType : 'application/json',
+                    dataType: 'json',
+                    data : data,
+                    success: function(data){
+                        alert("successfull inserted nas to db");
+                        $("#addNasForm").hide();
+                    },
+                    error : function(){
+                        alert('could not insert to db');
+                    }
+                });
+            });
 //==================================================================================
             //--------------------btnLogin----------------------
             $("#btnLogin").click(function(e){
