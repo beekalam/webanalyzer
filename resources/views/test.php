@@ -26,8 +26,9 @@
           </button>
         </div>
             <ul class="nav navbar-nav">
-                <li><a id='manageNases' href="#">manage nases</a></li> 
-                <li><a id='addNas' href="#">add nas</a></li>
+                <li><a id='home' href="">home</a></li>
+                <li><a id='manageNases' href="">manage nases</a></li> 
+                <li><a id='addNas' href="">add nas</a></li>
             </ul>
             <div id="navbar" class="navbar-collapse collapse">
                 <!--+++++ login form++++++++++++++++-->
@@ -57,33 +58,33 @@
         <input type="submit" id="create" class="btn btn-success">
         <hr>
         </form>
-        
-        <button id="alllogins" class="btn"> all logins</button>
-        <button id="showuserlogs" class="btn">user login details</button>
-        <input type="text" placeholder="username" id ="usertext" value="user1" >
+       <div id="headform"> 
+            <button id="alllogins" class="btn"> all logins</button>
+            <button id="showuserlogs" class="btn">user login details</button>
+            <input type="text" placeholder="username" id ="usertext" value="user1" >
 
-        <input id="start_date_input" type="text">
-        <input id="start_date_btn" type="button" value="start_date">
-        <script>
-            Calendar.setup({
-                inputField: 'start_date_input',
-                button: 'start_date_btn',
-                ifFormat: '%Y/%m/%d',
-                dateType: 'jalali'
-            });
-        </script>
+            <input id="start_date_input" type="text">
+            <input id="start_date_btn" type="button" value="start_date">
+            <script>
+                Calendar.setup({
+                    inputField: 'start_date_input',
+                    button: 'start_date_btn',
+                    ifFormat: '%Y/%m/%d',
+                    dateType: 'jalali'
+                });
+            </script>
 
-        <input id="end_date_input" type="text">
-        <input id="end_date_btn" type="button" value="end_date">
-        <script>
-            Calendar.setup({
-                inputField: 'end_date_input',
-                button: 'end_date_btn',
-                ifFormat: '%Y/%m/%d',
-                dateType: 'jalali'
-            });
-        </script>
-
+            <input id="end_date_input" type="text">
+            <input id="end_date_btn" type="button" value="end_date">
+            <script>
+                Calendar.setup({
+                    inputField: 'end_date_input',
+                    button: 'end_date_btn',
+                    ifFormat: '%Y/%m/%d',
+                    dateType: 'jalali'
+                });
+            </script>
+        </div>
         <div id="users">
         </div>
 
@@ -237,7 +238,8 @@
 //==================================================================================
             $("#manageNases").click(function(e){
                 e.preventDefault();
-                // alert("in manageNases click");
+                $("#addNasForm").hide();
+                $("#headform").hide();
                 get_nas_list(function(data){
                     $("#users").empty();
                     $("#users").append(render_nases(data));
@@ -311,6 +313,7 @@
 //==================================================================================
             $('#addNas').click(function(e){
                 e.preventDefault();
+                $("headform").hide();
                 $("#users").empty();
                 $("#addNasForm").show();
             })
@@ -343,6 +346,14 @@
                     }
                 });
             });
+//==================================================================================
+            //----------------- home url click -----------------
+            $("#home").click(function(e){
+                e.preventDefault();
+                $("#headform").show();
+                $("#users").empty();
+                $("#addNasForm").hide();
+            })
 //==================================================================================
             //--------------------btnLogin----------------------
             $("#btnLogin").click(function(e){

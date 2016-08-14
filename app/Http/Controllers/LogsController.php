@@ -13,7 +13,7 @@ use Log as llog;
 
 class LogsController
 {
-	private $per_page = 1000;
+	private $per_page = 20;
 	public function showxx($page)
 	{
 		$per_page = $this->per_page;
@@ -28,42 +28,41 @@ class LogsController
 		$per_page = $this->per_page;
 		$offset = ($page * $per_page) - $per_page;
 
+		$count =  WebLog::count();
+		$pagination = $this->pagination($count, $page);
 		$data =  WebLog::orderBy('visited_at', 'desc')
-						->skip($offset)
-						->take($per_page)
-						->get();
+						 ->skip($offset)
+					     ->take($per_page)
+					     ->get();
 		// change to persian time
 		foreach ($data as $item) {
-			$date_part = explode(' ',$item["visited_at"])[0];
-			//$time_part = explode(' ',$item['visited_at'])[1];
-			$item['visited_at'] = $this->convertdate(new \DateTime($date_part));
-			//$item['visited_at'] += $time_part;
-			//$item['visited_at'] = $this->getPersianDate($item['visited_at']);
-			// if($item['serverside_file_type'] == '') $item['serverside_file_type'] = 'zzzz';
+			$item['visited_at'] = $this->getPersianDate($item['visited_at']);
 		}
 		$ret = ["data" => $data];
-
-		return json_encode($ret);
+		$ret = array_merge($ret, $pagination);
+		return $ret;
 	}
+
 
 	public function showLogs($username, $page)
 	{
 		$per_page = $this->per_page;
-		$per_page = 5;
 		$offset = ($page * $per_page) - $per_page;
 
-		$data = WebLog::where('username', '=', $username)
-						->orderBy('visited_at','desc')
+		$query = WebLog::where('username', '=', $username);
+		$count = $query->count();
+		$data = $query->orderBy('visited_at','desc')
 						->skip($offset)
 						->take($per_page)
 						->get();
 
 		foreach($data as $item){
-			$date_part = explode(' ', $item['visited_at'])[0];
-			$item['visited_at'] = $this->convertdate(new \DateTime($date_part));
-			
+			$item['visited_at'] = $this->getPersianDate($item['visited_at']);
 		}
+
+		$pagination = $this->pagination($count, $page);
 		$ret = ["data" => $data];
+		$ret = array_merge($ret,$pagination);
 		return $ret;
 	}
 
@@ -71,18 +70,20 @@ class LogsController
 	{
 		$per_page = $this->per_page;
 		$offset = ($page * $per_page)  - $per_page;
-		$data = WebLog::where('username', '=', $username)
+
+		$query = WebLog::where('username', '=', $username)
 						->where('visited_at', '>=', $startdate)
-						->where('visited_at', '<=', $enddate)
-						->orderBy('visited_at','desc')
-						->skip($offset)->take($per_page)->get();
+						->where('visited_at', '<=', $enddate);
+		$count = $query->count();
+		$data = $query->orderBy('visited_at','desc')
+					  ->skip($offset)->take($per_page)->get();
 
 		foreach($data as $item){
-			$date_part = explode(' ', $item['visited_at'])[0];
-			$item['visited_at'] = $this->convertdate(new \DateTime($date_part));
+			$item['visited_at'] = $this->getPersianDate($item['visited_at']);
 		}
-
+		$pagination = $this->pagination($count, $page);
 		$ret = ["data" => $data];
+		$ret = array_merge($ret, $pagination);
 		return $ret;
 	}
 
@@ -121,6 +122,7 @@ class LogsController
 
 		return ["success" => "success"];
 	}
+
 	public function deleteNas($id)
 	{
 		// fixme : use exceptions here
@@ -134,44 +136,39 @@ class LogsController
 		// fixme: what went wrong here
 		return ["error" => "error"];
 	}
-	public function showWebLogs($connection_log_id, $page)
-	{
-		$per_page = $this->per_page;
-		$offset = ($page * $per_page) - $per_page;
-
-		// find all connection_log_details with the $user_id
-		// $m = ['name' => 'username', 'value' => $user_name];
-		$session_log_details = ConnectionLogDetail::where('connection_log_id', '=',$connection_log_id)
-								->where('name','ippool_assigned_ip')
-								->first();
-
- 		$session_ip = $session_log_details['value'];
-		$login_time = $session_log_details['login_time'];
-		$logout_time = $session_log_details['logout_time'];
-
-		$data = Log::where('source','=', $session_ip)
-					->whereBetween('visited_at', [$login_time, $logout_time])
-					->skip($offset)->take(10)->get();
-
-		foreach($data as $item){
-			$item["visited_at"] = $this->converttime(new \DateTime($item["login_time"]));
-		}
-
-		$ret = ["data" => $data,
-				 "login_time" => $login_time,
-				 "logout_time" => $logout_time
-				];
-
-		return $ret;
-	}
-
+	
 
 	private function getPersianDate($datetime)
 	{
-		$date_part = explode(' ',$datetime)[0];
-		$time_part = explode(' ', $datetime)[1];
+		list($date_part, $time_part) = explode(' ',$datetime);
+		$time_part = explode('.', $time_part);
+		$time_part = isset($time_part[0]) ? $time_part[0] : '';
 		$c_date = $this->convertdate(new \DateTime($date_part));
-		return $c_date + " " + $time_part;
+		return $c_date . " " . $time_part; 
+	}
+
+	private function pagination($count,$page)
+	{
+		$total = 0;
+		if ($count != 0)
+		{
+			$total = (int)($count / $this->per_page);
+			if( $count % $this->per_page > 0)
+			{
+				$total += 1;
+			}
+		}
+		$hasNext = "true";
+		if ($page == $total || $count == 0)
+		{
+			$hasNext = "false";
+		}
+		$hasPrev = "true";
+		if ($page == 1 || $count == 0)
+		{
+			$hasPrev = "false";
+		}
+		return ["total" => $total, "hasNext" => $hasNext, "hasPrev" => $hasPrev];
 	}
 
 	private function convertdate($datetime,$separator="-")
