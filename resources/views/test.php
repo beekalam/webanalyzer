@@ -8,6 +8,20 @@
         <link href="/css/bootstrap.min.css" rel="stylesheet">
         <!-- <link href="assets/css/custom.css" rel="stylesheet"> -->
         <link rel="stylesheet" href="/jalalicalendar/skins/aqua/theme.css">
+                <style>
+            #ajaxloading
+            {
+                position: fixed;
+                left: 0px;
+                top: 0px;
+                width: 100%;
+                height: 100%;
+                background:transparent url('image/ajax-loader.gif') center no-repeat;
+                font-size: 0px;
+                z-index: 9999;
+                display: block;
+            }
+        </style>
         <script src="/js/jquery-1.12.4.js"></script>
         <script src="/jalalicalendar/jalali.js"></script>
         <script src="/jalalicalendar/calendar.js"></script>
@@ -27,8 +41,25 @@
         </div>
             <ul class="nav navbar-nav">
                 <li><a id='home' href="">home</a></li>
-                <li><a id='manageNases' href="">manage nases</a></li> 
-                <li><a id='addNas' href="">add nas</a></li>
+                <li class='dropdown'>
+                <a class='dropdown-toggle' href='#' data-toggle='dropdown' role='button' aria-expanded='false' aria-haspopup='true'>
+                    NAS
+                </a>
+                    <ul class="dropdown-menu">
+                        <li><a id='manageNases' href="">manage nases</a></li> 
+                        <li><a id='addNas' href="">add nas</a></li>
+                    </ul>
+                </li>
+                <li class='dropdown'>
+                <a class='dropdown-toggle' href='#' data-toggle='dropdown' role='button' aria-expanded='false' aria-haspopup='true'>
+                    RULE
+                </a>
+                    <ul class="dropdown-menu">
+                        <li><a id='manageRules' href="">manage rules</a></li>
+                        <li><a id='addRule' href="">add rule</a></li>
+                    </ul>
+                </li>
+
             </ul>
             <div id="navbar" class="navbar-collapse collapse">
                 <!--+++++ login form++++++++++++++++-->
@@ -85,10 +116,13 @@
                 });
             </script>
         </div>
+
+        <div id="ajaxloading">
+        </div>
         <div id="users">
         </div>
 
-        <form id="addNasForm" style="display:none">
+        <div id="addNasForm" style="display:none">
             <div class="form-group">
                 <label for="nasip">nas ip: </label>
                 <input type="text" class="form-control" id="nasip" required>
@@ -107,17 +141,44 @@
             </div>
             <button type="submit" class="btn btn-default" id="btnAddNas">submit</button>
         </div>
+
+       <div id="addRulesForm" style="display:none">
+            <div class="form-group">
+                <label for="exclusionName"> filter type: </label>
+                <select id="exclusionName" class="form-control">
+                    <option value="1">extension</option>
+                    <option value="2">domain</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="exclusionValue">value: </label>
+                <input type="text" id="exclusionValue" class="form-control" required  minlength="2">
+            </div>
+            <button type="submit" class="btn btn-default" id="btnAddRule">submit</button>
+        </div>
         </div>
 
-        <script src="/js/bootstrap.min.js"></script>
+ 
 
+        <script src="/js/bootstrap.min.js"></script>
+        <script>
+         $(document).ready(function(){
+                $("#ajaxloading").hide();
+            $(document).ajaxStart(function(){
+                $("#ajaxloading").show();
+            });
+            $(document).ajaxStop(function(){
+                $("#ajaxloading").hide();
+            });
+         });
+        </script>
         <script>
              var store = store || {};
              store.setJWT = function(data){
                   this.JWT = data;
             }
 
-            //base_url = 'http://172.16.8.13:8000/';
+            // base_url = 'http://172.16.8.13:8000/';
             base_url = 'http://localhost:8000/';
             all_logs_url = base_url + 'logs/';
             user_log_url = base_url + 'logs/';
@@ -129,7 +190,9 @@
             weblog_page = 1;
             userlog_details_page = 1;
 
-            $('#alllogins').click(function(e){
+            
+
+       $('#alllogins').click(function(e){
                 "ues strict";
                 $('#users').empty();
                 e.preventDefault();
@@ -236,10 +299,12 @@
                 });
             }
 //==================================================================================
+            // ------------ Manage Nases --------------------------------
             $("#manageNases").click(function(e){
                 e.preventDefault();
                 $("#addNasForm").hide();
                 $("#headform").hide();
+                $("#addRulesForm").hide();
                 get_nas_list(function(data){
                     $("#users").empty();
                     $("#users").append(render_nases(data));
@@ -256,7 +321,9 @@
                     contentType:'application/json',
                     success:function(data){
                         console.log(data);
-                        //fixme trigger manage nases here
+                        $("#headform").show();
+                        window.location.href= base_url;
+                        $("#headform").show();
                     },
                     error:function(){
                         alert("could not delete nas");
@@ -288,7 +355,7 @@
                 {
                     thead += "<th>" + i + "</th>";
                 }
-                thead += "<th> edit </th>";
+                // thead += "<th> edit </th>";
                 thead += "<th> delete </th>";
                 thead += "</tr></thead>";
 
@@ -298,7 +365,7 @@
                         tbody += "<td>" + item[i] + "</td>";
                     }
                     console.log(item);
-                    tbody += "<td><button id='editNas' class='btn btn-success' value='" + item['nas_id'] + "'>edit</button></td>";
+                    // tbody += "<td><button id='editNas' class='btn btn-success' value='" + item['nas_id'] + "'>edit</button></td>";
                     tbody += "<td><button id='deleteNas' class='btn btn-success' value='" + item['nas_id'] + "'>delete</button></td>";
                     tbody += "</tr>";
                 });
@@ -311,16 +378,15 @@
                 return ret;
             }
 //==================================================================================
+            //------------ add nas  ---------------------------------
             $('#addNas').click(function(e){
                 e.preventDefault();
-                $("headform").hide();
-                $("#users").empty();
+                reset_all()
                 $("#addNasForm").show();
             })
 
             $('#btnAddNas').click( function(e){
                 e.preventDefault(); 
-                alert('inside btnAddNas');
                 nasip = $('#nasip').val();
                 username = $('#nasusername').val();
                 password = $('#naspassword').val();
@@ -336,13 +402,14 @@
                     type : 'POST',
                     contentType : 'application/json',
                     dataType: 'json',
-                    data : data,
+                        data : data,
                     success: function(data){
-                        alert("successfull inserted nas to db");
+                        // alert("successfull inserted nas to db");
                         $("#addNasForm").hide();
                     },
-                    error : function(){
-                        alert('could not insert to db');
+                    error : function(err){
+                        //alert('could not insert to db');
+                        console.log(err["error"]);
                     }
                 });
             });
@@ -350,10 +417,148 @@
             //----------------- home url click -----------------
             $("#home").click(function(e){
                 e.preventDefault();
+                reset_all();
                 $("#headform").show();
-                $("#users").empty();
-                $("#addNasForm").hide();
             })
+//=========================== rules  ==================================================
+            //---------------- manage rules click ----------------
+            function reset_all()
+            {
+                $("#headform").hide();
+                $("#addNasForm").hide();
+                $("#addRulesForm").hide();
+                $("#users").empty();
+                $("#exclusionValue").val('');
+                $("#nasusername").val('');
+                $("#nasip").val('');
+                $("#naspassword").val('');
+            }
+             $("#manageRules").click(function(e){
+                e.preventDefault();
+                reset_all();
+                get_rule_list(function(data){
+                    if(data['status'] === 'success')
+                    {
+                        $("#users").append(render_rules(data));
+                    }
+                })
+             });
+
+             function get_rule_list(handleData)
+             {
+                url = base_url + "rules";
+                // data ={'jwt' : store.JWT};
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    contentType:'application/json',
+                    dataType:'json',
+                    // data: data,
+                    success:function(data){
+                        handleData(data);
+                    }
+                });
+             }
+
+             function render_rules(data)
+             {
+                ret = "<div class='table-responsive'>";
+                ret += "<table class='table table-striped'>";
+                thead = "<thead><tr>";
+                tbody = "<tbody>";
+                for(var i in data["data"][0])
+                {
+                    thead += "<th>" + i + "</th>";
+                }
+                thead += "<th> delete </th>";
+                thead += "</tr></thead>";
+
+                $.each(data["data"], function(index,item){
+                    tbody += "<tr>";
+                    for (var i in item) {
+                        tbody += "<td>" + item[i] + "</td>";
+                    }
+                    console.log(item);
+                    tbody += "<td><button id='deleteRule' class='btn btn-success' value='" + item['exclusion_rules_id'] + "'>delete</button></td>";
+                    tbody += "</tr>";
+                });
+
+                tbody += "</tbody>";
+                ret += thead;
+                ret += tbody;
+                ret += "</table>";
+                ret += "</div>";
+                return ret;
+             }
+             //---------------deleteRue ------------------------
+             $("#users").on('click', '#deleteRule', function(e){
+                e.preventDefault();
+                 ruleid = parseInt(this["value"]);
+                url = base_url + "rules/delete/" + ruleid;
+                $.ajax({
+                    url:url,
+                    type:'POST',
+                    contentType:'application/json',
+                    success:function(data){
+                        console.log(data);
+                        $("#headform").show();
+                        window.location.href= base_url;
+                        $("#headform").show();
+                    },
+                    error:function(){
+                        alert("could not delete rule");
+                    }
+                });
+             })
+            //---------------- btnAddRule click-------------------
+            $("#addRule").click(function(e){
+                e.preventDefault();
+                reset_all();
+                $("#addRulesForm").show();
+            });
+
+            var errorHandler = function (msg)
+            {
+                alert(msg);
+            };
+
+            $("#btnAddRule").click(function(e){
+                e.preventDefault();
+                exclusion_value = $("#exclusionValue").val();
+                selIndex = parseInt($('#exclusionName').val());
+                exclusion_name = '';
+                switch(selIndex)
+                {
+                    case 1:
+                        exclusion_name = 'by_ext';
+                        break;
+                    case 2:
+                        exclusion_name = 'by_domain';
+                        break;
+                }
+                data = JSON.stringify({ 'exclusion_name' : exclusion_name,
+                                        'exclusion_value' : exclusion_value});
+                url = base_url + "rules/";
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    data: data,
+                    success: function(data) {
+                        if ( data["status"] === "error")
+                        {
+                            errorHandler(data['msg']);
+                            return;
+                        }
+                         $("#manageRules").trigger('click');
+                    },
+                    error: function(xhr, status, error){
+                        alert("error in addrule");
+                    }
+                });
+            });
 //==================================================================================
             //--------------------btnLogin----------------------
             $("#btnLogin").click(function(e){
@@ -405,8 +610,14 @@
                 ret += thead;
                 ret += tbody;
                 ret += "</table>";
-                ret += "<button id='btnPrev' class='btn btn-success'>prev</button>";
-                ret += "<button id='btnNext' class='btn btn-success'>next</button>";
+                if(data["hasPrev"] === "true")
+                {
+                    ret += "<button id='btnPrev' class='btn btn-success'>prev</button>";
+                }
+                if(data["hasNext"] === "true")
+                {
+                    ret += "<button id='btnNext' class='btn btn-success'>next</button>";
+                }
                 ret += "</div>";
                 return ret;
             } 

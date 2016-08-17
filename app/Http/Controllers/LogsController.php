@@ -7,6 +7,7 @@ use App\ConnectionLog;
 use App\LogView;
 use App\WebLog;
 use App\Nas;
+use App\ExclusionRule;
 use App\ConnectionLogDetail;
 use Illuminate\Http\Request;
 use Log as llog;
@@ -38,7 +39,7 @@ class LogsController
 		foreach ($data as $item) {
 			$item['visited_at'] = $this->getPersianDate($item['visited_at']);
 		}
-		$ret = ["data" => $data];
+		$ret = ["status" => "success" , "data" => $data];
 		$ret = array_merge($ret, $pagination);
 		return $ret;
 	}
@@ -49,7 +50,7 @@ class LogsController
 		$per_page = $this->per_page;
 		$offset = ($page * $per_page) - $per_page;
 
-		$query = WebLog::where('username', '=', $username);
+			$query = WebLog::where('username', '=', $username);
 		$count = $query->count();
 		$data = $query->orderBy('visited_at','desc')
 						->skip($offset)
@@ -61,7 +62,7 @@ class LogsController
 		}
 
 		$pagination = $this->pagination($count, $page);
-		$ret = ["data" => $data];
+		$ret = ["status" => "scuess", "data" => $data];
 		$ret = array_merge($ret,$pagination);
 		return $ret;
 	}
@@ -82,7 +83,7 @@ class LogsController
 			$item['visited_at'] = $this->getPersianDate($item['visited_at']);
 		}
 		$pagination = $this->pagination($count, $page);
-		$ret = ["data" => $data];
+		$ret = ["status" => "success" , "data" => $data];
 		$ret = array_merge($ret, $pagination);
 		return $ret;
 	}
@@ -91,7 +92,7 @@ class LogsController
 	{
 		$data = Nas::all();
 
-		$ret = ["data" => $data];
+		$ret = ["status" => "success", "data" => $data];
 		return $ret;
 	}
 
@@ -100,44 +101,143 @@ class LogsController
 		if (! $request->has('nasip'))
 		{
 			$error = "nas ip is empty";
-			return ["error" => $error];
+			return ["status" => "error", "msg" => $error];
 		}
+		else
+		{
+			// check for unique nases when inserting to db
+			$nas_exists = Nas::where('nasip', '=', $request->input('nasip'))->first();
+			if (!is_null($nas_exists))
+			{
+				return ["status" => "error", "msg" => "nas ip already exists"];
+			}
+		}
+
 		if ($request->has('user') && !$request->has('password') )
 		{
 			$error = "password is empty";
-			return ["error" => $error];
+			return ["status" => "error", "msg" => $error];
 		}
 		if ($request->has('password') && ! $request->has('username'))
 		{
 			$error = "username is empty";
-			return ["error" => $error];
+			return ["status" => "error" ,"msg" => $error];
 		}
+		
+
 		$nas = new Nas;
 		$nas->nasip = $request->input('nasip');
 		$nas->username = $request->has('username') ? $request->input('username') : '';
 		$nas->password = $request->has('password') ?  $request->input('password') : '';
 		$nas->description =$request->has('description') ? $request->input('description') : '';
 
+		
 		$nas->save();
 
-		return ["success" => "success"];
+		return ["status" => "success"];
 	}
 
 	public function deleteNas($id)
 	{
+		// check that there is at least on nas available on delete
+		$nas_count  = Nas::count();
+		if ($nas_count == 1)
+		{
+			return ["status" => "error" , "msg" => "there should be at least one nas available"];
+		}
 		// fixme : use exceptions here
 		$nas = Nas::where('nas_id', '=', $id)->first();
 		if ($nas)
 		{
 			$nas->delete();
-			return ["success" => "success"];
+			return ["status" => "success"];
 		}
 
 		// fixme: what went wrong here
-		return ["error" => "error"];
+		return ["status" => "error"];
 	}
-	
+	//======================================================================
+	public function getRules()
+	{
+		$all_rules = ExclusionRule::all();
+		$ret = ["status" => "success" ,"data" => $all_rules];
+		return $ret;
+	}
 
+	public function deleteRule($id)
+	{
+		$rule = ExclusionRule::where('exclusion_rules_id', '=', $id)->first();
+		if ($rule)
+		{
+			$rule->delete();
+			return ["status" => "scuess"];
+		}
+
+		//fixme: what went wrong
+		return ["status" => "error"];
+	}
+
+	public function createRule(Request $request)
+	{
+		$msg = $this->validateRule($request);
+		if($msg["haserror"])
+		{
+			return ["status" => "error", "msg" => $msg["error"]];
+		}
+		$rule_name = $request->input('exclusion_name');
+		$rule_value  = $request->input('exclusion_value');
+
+		$rule = new Exclusionrule;
+		$rule->exclusion_name = $rule_name;
+		$rule->exclusion_value = $rule_value;
+		$rule->save();
+
+		return ["status" => "success"];
+	}
+
+	private function validateRule(Request $request)
+	{
+		$make_message  = function($has_error, $error_msg){
+			return ["haserror" => $has_error, "error" => $error_msg];
+		};
+
+		if ( ! $request->has('exclusion_name') )
+		{
+			$error = "rule name not provided";
+			return $make_message(true, $error);
+		}
+
+		if (! $request->has('exclusion_value'))
+		{
+			$error = "rule value not provided";
+			return $make_message(true, $erro);
+		}
+
+		$exclusion_name = $request->input('exclusion_name');
+		$exclusion_value = $request->input('exclusion_value');
+
+		if ( $exclusion_name === '')
+		{
+			$error = "rule name is empty";
+			return $make_message(true, $error);
+		}
+
+		if ( $exclusion_value === '')
+		{
+			$error = "rule value is empty";
+			return $make_message(true, $error);
+		}
+
+		$rule_exists = ExclusionRule::where('exclusion_value' , '=', $exclusion_value)->first();
+		if ($rule_exists)
+		{
+			$error = "rule value already in db";
+			return $make_message(true, $error);
+		}
+
+		return $make_message(false,"");
+	}
+	//======================================================================
 	private function getPersianDate($datetime)
 	{
 		list($date_part, $time_part) = explode(' ',$datetime);

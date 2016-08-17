@@ -66,6 +66,22 @@ $app->get('/nases/delete/{id:[\d]+}',[
     // 'middleware' => 'auth',
     'uses' => 'LogsController@deleteNas'
 ]);
+
+$app->get('/rules/' , [
+    // 'middleware' => 'auth',
+    'uses' => 'LogsController@getRules'
+]);
+
+$app->post('/rules/', [
+    // 'middleware' => 'auth',
+    'uses' => 'LogsController@createRule'
+]);
+
+$app->post('/rules/delete/{id:[\d]+}', [
+    // 'middleware' => 'auth',
+    'uses' => 'LogsController@deleteRule'
+]);
+
 // $app->get('/weblogs/{connection_log_id}/{page}', [
 //     // 'middleware' =>'auth',
 //      'uses' => 'LogsController@showWebLogs'
