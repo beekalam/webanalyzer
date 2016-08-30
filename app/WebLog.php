@@ -5,5 +5,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class WebLog extends Model
 {
-	protected $table = "weblogs";	
+	protected $table = "weblogs";
 }

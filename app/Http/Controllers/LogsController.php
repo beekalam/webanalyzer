@@ -14,7 +14,7 @@ use Log as llog;
 
 class LogsController
 {
-	private $per_page = 20;
+	private $per_page = 1000;
 	public function showxx($page)
 	{
 		$per_page = $this->per_page;

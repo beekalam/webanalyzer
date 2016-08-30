@@ -3,11 +3,13 @@
 namespace App\Providers;
 
 use App\User;
+use App\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Firebase\JWT\JWT;
-
+use App\JWTAuthenticate;
+use Log as llog;
 class AuthServiceProvider extends ServiceProvider
 {
     /**
@@ -33,13 +35,14 @@ class AuthServiceProvider extends ServiceProvider
         // the User instance via an API token or any other method necessary.
 
         Auth::viaRequest('api', function ($request) {
-            if ($request->input('jwt')) 
+            // llog::info("=======================[boot/]");
+            if ($request->has('jwt')) 
             {
+                // llog::info("======================[boot/2]");
                  try
                  {
                     $jwt = $request->input('jwt');
-                    //todo: read from config
-                    $key = "123";
+                    $key = env("APP_KEY");
                     $algorithm = ['HS256'];
                     $token = JWT::decode($jwt, $key,$algorithm);
                     return ['jwt' => $jwt];

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8"/>
@@ -178,8 +178,8 @@
                   this.JWT = data;
             }
 
-            // base_url = 'http://172.16.8.13:8000/';
-            base_url = 'http://localhost:8000/';
+            base_url = 'http://172.16.8.13:8000/';
+            // base_url = 'http://localhost:8000/';
             all_logs_url = base_url + 'logs/';
             user_log_url = base_url + 'logs/';
             weblogs_url = base_url + 'weblogs/';
@@ -190,7 +190,20 @@
             weblog_page = 1;
             userlog_details_page = 1;
 
-            
+            function reset_all()
+            {
+                $("#headform").hide();
+                $("#addNasForm").hide();
+                $("#addRulesForm").hide();
+                $("#users").empty();
+                $("#exclusionValue").val('');
+                $("#nasusername").val('');
+                $("#nasip").val('');
+                $("#naspassword").val('');
+                $("#start_date_input").val('');
+                $("#end_date_input").val('');
+                $("#usertext").val('');
+            }
 
        $('#alllogins').click(function(e){
                 "ues strict";
@@ -315,15 +328,17 @@
                 e.preventDefault();
                 nasid = parseInt(this["value"]);
                 url = base_url + "nases/delete/" + nasid;
+                data ={'jwt' : store.JWT};
                 $.ajax({
                     url:url,
                     type:'GET',
                     contentType:'application/json',
+                    dataType:'json',
+                    data: data,
                     success:function(data){
                         console.log(data);
-                        $("#headform").show();
-                        window.location.href= base_url;
-                        $("#headform").show();
+                        reset_all();
+                         $("#manageNases").trigger('click');
                     },
                     error:function(){
                         alert("could not delete nas");
@@ -333,13 +348,13 @@
 
             function get_nas_list(handleData){
                 url = base_url + "nases";
-                // data ={'jwt' : store.JWT};
+                data ={'jwt' : store.JWT};
                 $.ajax({
                     url: url,
                     type: 'GET',
                     contentType:'application/json',
                     dataType:'json',
-                    // data: data,
+                    data: data,
                     success:function(data){
                         handleData(data);
                     }
@@ -394,7 +409,8 @@
                 data = JSON.stringify({"nasip" : nasip,
                                         "username": username,
                                         "password": password,
-                                        "description" : description });
+                                        "description" : description,
+                                        "jwt": store.JWT });
                 console.log(data);
                 url= base_url + "nases/add";
                 $.ajax({
@@ -402,7 +418,7 @@
                     type : 'POST',
                     contentType : 'application/json',
                     dataType: 'json',
-                        data : data,
+                    data : data,
                     success: function(data){
                         // alert("successfull inserted nas to db");
                         $("#addNasForm").hide();
@@ -422,17 +438,7 @@
             })
 //=========================== rules  ==================================================
             //---------------- manage rules click ----------------
-            function reset_all()
-            {
-                $("#headform").hide();
-                $("#addNasForm").hide();
-                $("#addRulesForm").hide();
-                $("#users").empty();
-                $("#exclusionValue").val('');
-                $("#nasusername").val('');
-                $("#nasip").val('');
-                $("#naspassword").val('');
-            }
+
              $("#manageRules").click(function(e){
                 e.preventDefault();
                 reset_all();
@@ -447,13 +453,13 @@
              function get_rule_list(handleData)
              {
                 url = base_url + "rules";
-                // data ={'jwt' : store.JWT};
+                data ={'jwt' : store.JWT};
                 $.ajax({
                     url: url,
                     type: 'GET',
                     contentType:'application/json',
                     dataType:'json',
-                    // data: data,
+                    data: data,
                     success:function(data){
                         handleData(data);
                     }
@@ -493,19 +499,25 @@
              //---------------deleteRue ------------------------
              $("#users").on('click', '#deleteRule', function(e){
                 e.preventDefault();
-                 ruleid = parseInt(this["value"]);
+                ruleid = parseInt(this["value"]);
                 url = base_url + "rules/delete/" + ruleid;
+                data ={'jwt' : store.JWT};
+                console.log(data);
                 $.ajax({
                     url:url,
-                    type:'POST',
+                    type:'GET',
                     contentType:'application/json',
+                    dataType: 'json',
+                    data: data,
                     success:function(data){
                         console.log(data);
-                        $("#headform").show();
-                        window.location.href= base_url;
-                        $("#headform").show();
+                        reset_all();
+                         $("#manageRules").trigger('click');
                     },
-                    error:function(){
+                    error:function(xhr, status, error){
+                        console.log(xhr);
+                        console.log(status);
+                        console.log(error);
                         alert("could not delete rule");
                     }
                 });
@@ -529,7 +541,7 @@
                 exclusion_name = '';
                 switch(selIndex)
                 {
-                    case 1:
+                    case 1  :
                         exclusion_name = 'by_ext';
                         break;
                     case 2:
@@ -537,7 +549,8 @@
                         break;
                 }
                 data = JSON.stringify({ 'exclusion_name' : exclusion_name,
-                                        'exclusion_value' : exclusion_value});
+                                        'exclusion_value' : exclusion_value,
+                                         'jwt' : store.JWT});
                 url = base_url + "rules/";
 
                 $.ajax({
@@ -552,6 +565,7 @@
                             errorHandler(data['msg']);
                             return;
                         }
+                         reset_all();
                          $("#manageRules").trigger('click');
                     },
                     error: function(xhr, status, error){
@@ -583,6 +597,10 @@
                         alert('login error')
                     }
                 });
+            });
+            //-----------------------------------------------------------------
+            $("#btnlogout").click(function(e){
+               window.location.href = base_url; 
             });
             //-----------------------------------------------------------------
             function render_log(data)
