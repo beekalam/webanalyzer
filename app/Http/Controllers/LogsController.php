@@ -24,26 +24,56 @@ class LogsController
 		return $ret;
 	}
 
-	public function showAllLogs($page)
-	{
-		$per_page = $this->per_page;
-		$offset = ($page * $per_page) - $per_page;
+	// public function showAllLogs($page)
+	// {
+	// 	$per_page = $this->per_page;
+	// 	$offset = ($page * $per_page) - $per_page;
 
-		$count =  WebLog::count();
-		$pagination = $this->pagination($count, $page);
-		$data =  WebLog::orderBy('visited_at', 'desc')
-						 ->skip($offset)
-					     ->take($per_page)
-					     ->get();
-		// change to persian time
-		foreach ($data as $item) {
-			$item['visited_at'] = $this->getPersianDate($item['visited_at']);
-		}
-		$ret = ["status" => "success" , "data" => $data];
-		$ret = array_merge($ret, $pagination);
-		return $ret;
-	}
+	// 	$count =  WebLog::count();
+	// 	$pagination = $this->pagination($count, $page);
+	// 	$data =  WebLog::orderBy('visited_at', 'desc')
+	// 					 ->skip($offset)
+	// 				     ->take($per_page)
+	// 				     ->get();
+	// 	// change to persian time
+	// 	foreach ($data as $item) {
+	// 		$item['visited_at'] = $this->getPersianDate($item['visited_at']);
+	// 	}
+	// 	$ret = ["status" => "success" , "data" => $data];
+	// 	$ret = array_merge($ret, $pagination);
+	// 	return $ret;
+	// }
+	
+	// new logs added by me and ashkan for performance
+    public function showAllLogs($page)
+    {
+            $per_page = $this->per_page;
+            $offset = ($page * $per_page) - $per_page;
 
+            //$count =  WebLog::count();
+            $count = 1000000;
+            $pagination = $this->pagination($count, $page);
+//-----------------------------------------------
+//              $data =  WebLog::orderBy('visited_at', 'desc')
+//                                               ->skip($offset)
+//                                           ->take($per_page)
+//                                           ->get();
+//----------------------------------------------------------
+
+//-----------------------------------------------
+            $data =  WebLog::skip($offset)
+                                            ->orderBy('weblog_id', 'desc')
+                                         ->take($per_page)
+                                         ->get();
+//----------------------------------------------------------
+            // change to persian time
+            //foreach ($data as $item) {
+            //      $item['visited_at'] = $this->getPersianDate($item['visited_at']);
+            //}
+            $ret = ["status" => "success" , "data" => $data];
+            $ret = array_merge($ret, $pagination);
+            return $ret;
+    }
 
 	public function showLogs($username, $page)
 	{
